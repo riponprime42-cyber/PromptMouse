@@ -8,6 +8,7 @@ export interface PromptEntry {
     subject: string;
     style: string;
     mood: string;
+    aspectRatio?: string;
     artisticReferences?: string[];
   };
 }

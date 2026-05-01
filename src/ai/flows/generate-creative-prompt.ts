@@ -20,6 +20,10 @@ const GenerateCreativePromptInputSchema = z.object({
   mood: z
     .string()
     .describe('The desired mood or atmosphere (e.g., "epic", "serene", "mysterious").'),
+  aspectRatio: z
+    .string()
+    .optional()
+    .describe('The intended aspect ratio of the image or video (e.g., "16:9", "1:1", "9:16").'),
   artisticReferences: z
     .array(z.string())
     .optional()
@@ -49,6 +53,9 @@ Generate a detailed and unique creative prompt for an image or video generation 
 Subject: {{{subject}}}
 Style: {{{style}}}
 Mood: {{{mood}}}
+{{#if aspectRatio}}
+Aspect Ratio: {{{aspectRatio}}} (Ensure the composition and framing described in the prompt complement this aspect ratio)
+{{/if}}
 {{#if artisticReferences}}
 Artistic References: {{#each artisticReferences}} - {{{this}}}
 {{/each}}

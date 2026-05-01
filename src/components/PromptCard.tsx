@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Copy, Heart, Trash2, Edit3, Check, X } from 'lucide-react';
+import { Copy, Heart, Trash2, Edit3, Check, X, Maximize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -53,6 +53,11 @@ export function PromptCard({ prompt, onUpdate, onToggleFavorite, onDelete }: Pro
             <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-accent/20 text-accent border border-accent/20">
               {prompt.parameters.mood}
             </span>
+            {prompt.parameters.aspectRatio && (
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white/70 border border-white/10 flex items-center gap-1">
+                <Maximize className="h-3 w-3" /> {prompt.parameters.aspectRatio}
+              </span>
+            )}
           </div>
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button

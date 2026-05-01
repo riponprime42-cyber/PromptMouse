@@ -26,6 +26,10 @@ const MOODS = [
   "Grim", "Vibrant", "Dreamy", "Energetic", "Melancholic"
 ];
 
+const ASPECT_RATIOS = [
+  "1:1", "16:9", "9:16", "4:3", "3:2", "21:9"
+];
+
 interface PromptFormProps {
   onGenerated: (entry: PromptEntry) => void;
 }
@@ -36,6 +40,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
     subject: '',
     style: 'Photorealistic',
     mood: 'Epic',
+    aspectRatio: '16:9',
     references: '',
   });
 
@@ -49,6 +54,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
         subject: formData.subject,
         style: formData.style,
         mood: formData.mood,
+        aspectRatio: formData.aspectRatio,
         artisticReferences: formData.references ? formData.references.split(',').map(s => s.trim()) : undefined,
       });
 
@@ -61,6 +67,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
           subject: formData.subject,
           style: formData.style,
           mood: formData.mood,
+          aspectRatio: formData.aspectRatio,
           artisticReferences: formData.references ? formData.references.split(',').map(s => s.trim()) : [],
         }
       };
@@ -88,7 +95,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label className="text-xs text-muted-foreground uppercase tracking-widest">Style</Label>
           <Select
@@ -118,6 +125,23 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
             <SelectContent>
               {MOODS.map(m => (
                 <SelectItem key={m} value={m}>{m}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground uppercase tracking-widest">Aspect Ratio</Label>
+          <Select
+            value={formData.aspectRatio}
+            onValueChange={(val) => setFormData(prev => ({ ...prev, aspectRatio: val }))}
+          >
+            <SelectTrigger className="bg-background/50 border-white/10">
+              <SelectValue placeholder="Ratio" />
+            </SelectTrigger>
+            <SelectContent>
+              {ASPECT_RATIOS.map(r => (
+                <SelectItem key={r} value={r}>{r}</SelectItem>
               ))}
             </SelectContent>
           </Select>
