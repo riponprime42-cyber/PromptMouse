@@ -71,7 +71,23 @@ const generateCreativePromptFlow = ai.defineFlow(
     outputSchema: GenerateCreativePromptOutputSchema,
   },
   async (input) => {
-    const {output} = await promptTemplate(input);
-    return output!;
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    while (attempts < maxAttempts) {
+      try {
+        const {output} = await promptTemplate(input);
+        if (output) return output;
+        throw new Error('No output from prompt template');
+      } catch (error: any) {
+        attempts++;
+        if (attempts >= maxAttempts) {
+          throw error;
+        }
+        // Wait before retrying (exponential backoff: 1s, 2s)
+        await new Promise((resolve) => setTimeout(resolve, attempts * 1000));
+      }
+    }
+    throw new Error('Generation failed after multiple attempts');
   }
 );

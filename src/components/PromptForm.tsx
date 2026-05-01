@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -15,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { generateCreativePrompt } from '@/ai/flows/generate-creative-prompt';
 import { PromptEntry } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 const STYLES = [
   "Photorealistic", "Digital Art", "Cyberpunk", "Fantasy Art", "Impressionistic", 
@@ -36,6 +36,7 @@ interface PromptFormProps {
 
 export function PromptForm({ onGenerated }: PromptFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     subject: '',
     style: 'Photorealistic',
@@ -74,8 +75,18 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
 
       onGenerated(newEntry);
       setFormData(prev => ({ ...prev, subject: '' }));
-    } catch (error) {
+      
+      toast({
+        title: "Prompt Crafted",
+        description: "Your creative vision has been expanded.",
+      });
+    } catch (error: any) {
       console.error('Generation failed', error);
+      toast({
+        title: "The Muse is Busy",
+        description: "The AI is currently experiencing high demand. Please try again in a few moments.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
