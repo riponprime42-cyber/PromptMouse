@@ -1,30 +1,29 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 264 19% 15%;
+    --background: 240 10% 4%;
     --foreground: 0 0% 98%;
-    --card: 264 25% 12%;
+    --card: 240 10% 6%;
     --card-foreground: 0 0% 98%;
-    --popover: 264 25% 12%;
+    --popover: 240 10% 6%;
     --popover-foreground: 0 0% 98%;
-    --primary: 270 59% 55%;
+    --primary: 263 70% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 264 15% 25%;
+    --secondary: 240 5% 15%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 264 15% 25%;
-    --muted-foreground: 264 10% 70%;
-    --accent: 300 81% 70%;
-    --accent-foreground: 264 25% 12%;
+    --muted: 240 5% 15%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 316 70% 50%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 264 15% 25%;
-    --input: 264 15% 25%;
-    --ring: 270 59% 55%;
-    --radius: 0.75rem;
+    --border: 240 5% 15%;
+    --input: 240 5% 15%;
+    --ring: 263 70% 50%;
+    --radius: 1rem;
   }
 }
 
@@ -35,22 +34,40 @@
   body {
     @apply bg-background text-foreground font-body antialiased;
     background-image: 
-      radial-gradient(circle at 0% 0%, hsla(270, 59%, 55%, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 100% 100%, hsla(300, 81%, 70%, 0.1) 0%, transparent 50%);
-    background-attachment: fixed;
+      radial-gradient(circle at 0% 0%, hsla(263, 70%, 50%, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 100% 100%, hsla(316, 70%, 50%, 0.05) 0%, transparent 40%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-blend-mode: overlay;
   }
 }
 
-.glass-panel {
-  @apply bg-card/60 backdrop-blur-md border border-white/10 shadow-xl;
+.glass-card {
+  @apply bg-card/40 backdrop-blur-xl border border-white/5 shadow-2xl;
 }
 
-.prompt-text {
-  @apply font-headline leading-relaxed tracking-tight;
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-br from-white via-white to-white/40;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+.mesh-gradient {
+  background: radial-gradient(at 0% 0%, hsla(263, 70%, 50%, 0.15) 0, transparent 50%), 
+              radial-gradient(at 50% 0%, hsla(316, 70%, 50%, 0.1) 0, transparent 50%), 
+              radial-gradient(at 100% 0%, hsla(263, 70%, 50%, 0.15) 0, transparent 50%);
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -58,5 +75,5 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-primary/30 rounded-full hover:bg-primary/50 transition-colors;
+  @apply bg-primary/20 rounded-full hover:bg-primary/40 transition-all;
 }
