@@ -1,0 +1,23 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Abstract digital waves with violet and magenta gradients",
+      "imageUrl": "https://picsum.photos/seed/promptmuse-hero/1200/800",
+      "imageHint": "abstract digital"
+    },
+    {
+      "id": "style-fantasy",
+      "description": "Fantasy landscape example",
+      "imageUrl": "https://picsum.photos/seed/fantasy/400/300",
+      "imageHint": "fantasy landscape"
+    },
+    {
+      "id": "style-cyberpunk",
+      "description": "Cyberpunk city example",
+      "imageUrl": "https://picsum.photos/seed/cyberpunk/400/300",
+      "imageHint": "cyberpunk city"
+    }
+  ]
+}
