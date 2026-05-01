@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -46,12 +45,19 @@ export function usePromptsStore() {
     setPrompts((prev) => prev.filter((p) => p.id !== id));
   };
 
+  const clearAllPrompts = () => {
+    if (window.confirm("Are you sure you want to clear all your history? This cannot be undone.")) {
+      setPrompts([]);
+    }
+  };
+
   return {
     prompts,
     addPrompt,
     updatePrompt,
     toggleFavorite,
     deletePrompt,
+    clearAllPrompts,
     isLoaded,
   };
 }
