@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A creative prompt generation AI agent.
@@ -20,10 +21,13 @@ const GenerateCreativePromptInputSchema = z.object({
   mood: z
     .string()
     .describe('The desired mood or atmosphere (e.g., "epic", "serene", "mysterious").'),
+  medium: z
+    .enum(['image', 'video'])
+    .describe('The target medium: either a static image or a moving video.'),
   aspectRatio: z
     .string()
     .optional()
-    .describe('The intended aspect ratio of the image or video (e.g., "16:9", "1:1", "9:16").'),
+    .describe('The intended aspect ratio (e.g., "16:9", "1:1", "9:16").'),
   artisticReferences: z
     .array(z.string())
     .optional()
@@ -46,22 +50,28 @@ const promptTemplate = ai.definePrompt({
   name: 'generateCreativePromptTemplate',
   input: {schema: GenerateCreativePromptInputSchema},
   output: {schema: GenerateCreativePromptOutputSchema},
-  prompt: `You are an expert creative prompt generator for AI image and video generation models. Your task is to expand high-level inputs into a detailed, unique, and inspiring prompt. Be descriptive and imaginative.
+  prompt: `You are an expert creative prompt generator for AI models like Midjourney, DALL-E 3, Runway, and Luma. 
+Your task is to expand high-level inputs into a detailed, unique, and inspiring prompt tailored for the specified medium.
 
-Generate a detailed and unique creative prompt for an image or video generation AI, based on the following specifications. The output must be a JSON object conforming to the provided schema.
-
+Specifications:
+Medium: {{{medium}}}
 Subject: {{{subject}}}
 Style: {{{style}}}
 Mood: {{{mood}}}
 {{#if aspectRatio}}
-Aspect Ratio: {{{aspectRatio}}} (Ensure the composition and framing described in the prompt complement this aspect ratio)
+Aspect Ratio: {{{aspectRatio}}}
 {{/if}}
 {{#if artisticReferences}}
 Artistic References: {{#each artisticReferences}} - {{{this}}}
 {{/each}}
 {{/if}}
 
-The generated prompt should be a single, cohesive sentence or short paragraph, ready to be fed directly into an image or video generation model. Do not include any introductory or concluding remarks, just the prompt itself. Make sure to capture the essence of the input in a visually rich description.`,
+Instructions:
+- If Medium is "video", focus on dynamic motion, camera pans, frame rates, and temporal transitions. Describe how the scene evolves over time.
+- If Medium is "image", focus on composition, lighting, texture, and intricate details that work in a single frame.
+- Be descriptive and imaginative.
+- The output must be a single cohesive paragraph ready for use in a generative model.
+- Do not include meta-commentary, just the prompt.`,
 });
 
 const generateCreativePromptFlow = ai.defineFlow(

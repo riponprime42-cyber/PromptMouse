@@ -8,6 +8,7 @@ export interface PromptEntry {
     subject: string;
     style: string;
     mood: string;
+    medium: 'image' | 'video';
     aspectRatio?: string;
     artisticReferences?: string[];
   };
