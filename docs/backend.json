@@ -1,0 +1,36 @@
+
+{
+  "entities": {
+    "Prompt": {
+      "title": "Prompt",
+      "description": "A generated creative prompt for image or video synthesis.",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "isFavorite": { "type": "boolean" },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "subject": { "type": "string" },
+            "style": { "type": "string" },
+            "mood": { "type": "string" },
+            "medium": { "type": "string", "enum": ["image", "video"] },
+            "aspectRatio": { "type": "string" },
+            "artisticReferences": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      },
+      "required": ["text", "timestamp", "isFavorite", "parameters"]
+    }
+  },
+  "auth": {
+    "providers": ["google", "password"]
+  },
+  "firestore": {
+    "/users/{userId}/prompts/{promptId}": {
+      "schema": "Prompt",
+      "description": "Collection of prompts saved by the user."
+    }
+  }
+}

@@ -6,18 +6,15 @@ import {
   Sparkles, 
   History, 
   Heart, 
-  PlusCircle, 
   Trash2, 
   ArrowRight, 
   Wand2, 
-  Compass, 
-  Cpu, 
-  Layers,
-  LayoutDashboard,
-  Box,
-  CircleDot,
-  ArrowLeft,
-  Stars
+  CircleDot, 
+  ArrowLeft, 
+  Stars, 
+  LogOut,
+  User,
+  LogIn
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -26,8 +23,20 @@ import { PromptCard } from './PromptCard';
 import { usePromptsStore } from '@/hooks/use-prompts-store';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
+import { useUser, useAuth } from '@/firebase';
+import { signOut } from 'firebase/auth';
+import { AuthView } from './AuthView';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function PromptMuseApp() {
+  const { user } = useUser();
+  const auth = useAuth();
   const { 
     prompts, 
     addPrompt, 
@@ -39,7 +48,7 @@ export function PromptMuseApp() {
   } = usePromptsStore();
 
   const [scrolled, setScrolled] = useState(false);
-  const [view, setView] = useState<'landing' | 'studio'>('landing');
+  const [view, setView] = useState<'landing' | 'studio' | 'auth'>('landing');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,7 +59,11 @@ export function PromptMuseApp() {
   }, []);
 
   const openStudio = () => {
-    setView('studio');
+    if (!user) {
+      setView('auth');
+    } else {
+      setView('studio');
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -59,9 +72,19 @@ export function PromptMuseApp() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleLogout = async () => {
+    if (!auth) return;
+    await signOut(auth);
+    setView('landing');
+  };
+
   const favorites = prompts.filter(p => p.isFavorite);
 
-  if (view === 'studio') {
+  if (view === 'auth') {
+    return <AuthView onBack={() => setView('landing')} onSuccess={() => setView('studio')} />;
+  }
+
+  if (view === 'studio' && user) {
     return (
       <div className="min-h-screen bg-background selection:bg-primary/30 font-body animate-reveal">
         {/* Studio Navbar */}
@@ -73,9 +96,30 @@ export function PromptMuseApp() {
               </div>
               <span className="text-xl font-black tracking-tight">PromptMuse Studio</span>
             </div>
-            <Button variant="ghost" onClick={closeStudio} className="rounded-full gap-2 text-white/60 hover:text-white">
-              <ArrowLeft className="h-4 w-4" /> Exit Studio
-            </Button>
+            
+            <div className="flex items-center gap-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {user.email?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 bg-background border-white/10" align="end">
+                  <DropdownMenuItem className="focus:bg-primary/10 gap-2 cursor-pointer" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button variant="ghost" onClick={closeStudio} className="rounded-full gap-2 text-white/60 hover:text-white">
+                <ArrowLeft className="h-4 w-4" /> Exit Studio
+              </Button>
+            </div>
           </div>
         </nav>
 
@@ -127,7 +171,7 @@ export function PromptMuseApp() {
               </div>
 
               <TabsContent value="history" className="grid gap-8 animate-reveal">
-                {isLoaded && prompts.length > 0 ? (
+                {prompts.length > 0 ? (
                   prompts.map((p) => (
                     <PromptCard key={p.id} prompt={p} onUpdate={updatePrompt} onToggleFavorite={toggleFavorite} onDelete={deletePrompt} />
                   ))
@@ -137,7 +181,7 @@ export function PromptMuseApp() {
               </TabsContent>
 
               <TabsContent value="favorites" className="grid gap-8 animate-reveal">
-                {isLoaded && favorites.length > 0 ? (
+                {favorites.length > 0 ? (
                   favorites.map((p) => (
                     <PromptCard key={p.id} prompt={p} onUpdate={updatePrompt} onToggleFavorite={toggleFavorite} onDelete={deletePrompt} />
                   ))
@@ -171,9 +215,15 @@ export function PromptMuseApp() {
           <div className="hidden md:flex items-center gap-12 text-sm font-bold uppercase tracking-widest">
             <button className="text-white/40 hover:text-white transition-colors">Features</button>
             <button className="text-white/40 hover:text-white transition-colors">Showcase</button>
-            <Button onClick={openStudio} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-12 shadow-2xl">
-              Enter Studio
-            </Button>
+            {user ? (
+               <Button onClick={openStudio} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-12 shadow-2xl">
+                Studio
+               </Button>
+            ) : (
+              <Button onClick={() => setView('auth')} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-12 shadow-2xl gap-2">
+                <LogIn className="h-4 w-4" /> Sign In
+              </Button>
+            )}
           </div>
         </div>
       </nav>
@@ -211,12 +261,12 @@ export function PromptMuseApp() {
       <section className="py-40 px-8 max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-16">
           {[
-            { icon: <Cpu />, title: "Neural Synthesis", desc: "Advanced algorithms tailored for the latest Gemini and Midjourney models." },
-            { icon: <Layers />, title: "Precision Control", desc: "Fine-tune medium, style, mood, and aspect ratio with scientific accuracy." },
-            { icon: <Box />, title: "Artifact Vault", desc: "Securely archive and iterate on your best creative engineering results." }
+            { icon: <Cpu className="h-full w-full" />, title: "Neural Synthesis", desc: "Advanced algorithms tailored for the latest Gemini and Midjourney models." },
+            { icon: <Layers className="h-full w-full" />, title: "Precision Control", desc: "Fine-tune medium, style, mood, and aspect ratio with scientific accuracy." },
+            { icon: <Box className="h-full w-full" />, title: "Artifact Vault", desc: "Securely archive and iterate on your best creative engineering results." }
           ].map((feature, i) => (
             <div key={i} className="group p-10 rounded-[3rem] bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-8 group-hover:scale-110 transition-transform">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-8 group-hover:scale-110 transition-transform p-4">
                 {feature.icon}
               </div>
               <h3 className="text-2xl font-black mb-4 tracking-tight">{feature.title}</h3>
@@ -258,4 +308,74 @@ function EmptyState({ icon, title, desc }: { icon: React.ReactNode, title: strin
       <p className="text-white/30 font-light">{desc}</p>
     </div>
   );
+}
+
+function Cpu(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="16" height="16" x="4" y="4" rx="2" />
+      <rect width="6" height="6" x="9" y="9" rx="1" />
+      <path d="M15 2v2" />
+      <path d="M15 20v2" />
+      <path d="M2 15h2" />
+      <path d="M2 9h2" />
+      <path d="M20 15h2" />
+      <path d="M20 9h2" />
+      <path d="M9 2v2" />
+      <path d="M9 20v2" />
+    </svg>
+  )
+}
+
+function Layers(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.91a1 1 0 0 0 0-1.83Z" />
+      <path d="m2.6 12.08 8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.91" />
+      <path d="m2.6 17.08 8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.91" />
+    </svg>
+  )
+}
+
+function Box(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+      <path d="m3.3 7 8.7 5 8.7-5" />
+      <path d="M12 22V12" />
+    </svg>
+  )
 }
