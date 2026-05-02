@@ -25,7 +25,7 @@
     }
   },
   "auth": {
-    "providers": ["google", "password"]
+    "providers": ["google", "password", "anonymous"]
   },
   "firestore": {
     "/users/{userId}/prompts/{promptId}": {
