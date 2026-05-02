@@ -11,10 +11,7 @@ import {
   Wand2, 
   CircleDot, 
   ArrowLeft, 
-  Stars, 
-  LogOut,
-  User,
-  LogIn
+  Stars
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -23,32 +20,19 @@ import { PromptCard } from './PromptCard';
 import { usePromptsStore } from '@/hooks/use-prompts-store';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
-import { useUser, useAuth } from '@/firebase';
-import { signOut } from 'firebase/auth';
-import { AuthView } from './AuthView';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function PromptMuseApp() {
-  const { user } = useUser();
-  const auth = useAuth();
   const { 
     prompts, 
     addPrompt, 
     updatePrompt, 
     toggleFavorite, 
     deletePrompt, 
-    clearAllPrompts,
-    isLoaded 
+    clearAllPrompts
   } = usePromptsStore();
 
   const [scrolled, setScrolled] = useState(false);
-  const [view, setView] = useState<'landing' | 'studio' | 'auth'>('landing');
+  const [view, setView] = useState<'landing' | 'studio'>('landing');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,11 +43,7 @@ export function PromptMuseApp() {
   }, []);
 
   const openStudio = () => {
-    if (!user) {
-      setView('auth');
-    } else {
-      setView('studio');
-    }
+    setView('studio');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -72,19 +52,9 @@ export function PromptMuseApp() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleLogout = async () => {
-    if (!auth) return;
-    await signOut(auth);
-    setView('landing');
-  };
-
   const favorites = prompts.filter(p => p.isFavorite);
 
-  if (view === 'auth') {
-    return <AuthView onBack={() => setView('landing')} onSuccess={() => setView('studio')} />;
-  }
-
-  if (view === 'studio' && user) {
+  if (view === 'studio') {
     return (
       <div className="min-h-screen bg-background selection:bg-primary/30 font-body animate-reveal">
         {/* Studio Navbar */}
@@ -98,24 +68,6 @@ export function PromptMuseApp() {
             </div>
             
             <div className="flex items-center gap-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        {user.email?.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-background border-white/10" align="end">
-                  <DropdownMenuItem className="focus:bg-primary/10 gap-2 cursor-pointer" onClick={handleLogout}>
-                    <LogOut className="h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
               <Button variant="ghost" onClick={closeStudio} className="rounded-full gap-2 text-white/60 hover:text-white">
                 <ArrowLeft className="h-4 w-4" /> Exit Studio
               </Button>
@@ -215,15 +167,9 @@ export function PromptMuseApp() {
           <div className="hidden md:flex items-center gap-12 text-sm font-bold uppercase tracking-widest">
             <button className="text-white/40 hover:text-white transition-colors">Features</button>
             <button className="text-white/40 hover:text-white transition-colors">Showcase</button>
-            {user ? (
-               <Button onClick={openStudio} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-12 shadow-2xl">
-                Studio
-               </Button>
-            ) : (
-              <Button onClick={() => setView('auth')} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-12 shadow-2xl gap-2">
-                <LogIn className="h-4 w-4" /> Sign In
-              </Button>
-            )}
+            <Button onClick={openStudio} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-12 shadow-2xl">
+              Studio
+            </Button>
           </div>
         </div>
       </nav>
