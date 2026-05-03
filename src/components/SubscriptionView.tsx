@@ -2,9 +2,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Check, ArrowLeft, Zap, ShieldCheck, Stars, Crown, CreditCard, Loader2 } from 'lucide-react';
+import { Check, ArrowLeft, ShieldCheck, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useSubscriptionStore, PLAN_LIMITS, PlanType } from '@/hooks/use-subscription-store';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,9 @@ interface SubscriptionViewProps {
   onBack: () => void;
 }
 
-const RAZORPAY_KEY_ID = "rzp_test_SiY4saWonMlJ9H";
+// Access the public key from environment variables for security.
+// Secret keys should NEVER be included in client-side code.
+const RAZORPAY_KEY_ID = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
 
 export function SubscriptionView({ onBack }: SubscriptionViewProps) {
   const { plan, upgradePlan } = useSubscriptionStore();
@@ -33,6 +35,21 @@ export function SubscriptionView({ onBack }: SubscriptionViewProps) {
     }
 
     setProcessingId(targetPlan);
+
+    // If no API key is present, we provide a mock payment flow for the prototype development
+    if (!RAZORPAY_KEY_ID) {
+      console.log("No Razorpay Key ID found. Initiating mock payment flow.");
+      setTimeout(() => {
+        setProcessingId(null);
+        upgradePlan(targetPlan);
+        toast({
+          title: "Protocol Expanded",
+          description: `Welcome to the ${PLAN_LIMITS[targetPlan].label} tier! (Demo Mode Activated)`,
+        });
+        onBack();
+      }, 1500);
+      return;
+    }
 
     const options = {
       key: RAZORPAY_KEY_ID,
@@ -65,8 +82,17 @@ export function SubscriptionView({ onBack }: SubscriptionViewProps) {
       }
     };
 
-    const rzp = new (window as any).Razorpay(options);
-    rzp.open();
+    try {
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      setProcessingId(null);
+      toast({
+        title: "Service Unavailable",
+        description: "Could not initialize the payment gateway. Please check your network.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -146,7 +172,7 @@ export function SubscriptionView({ onBack }: SubscriptionViewProps) {
 
         <footer className="text-center pt-20">
           <div className="flex items-center justify-center gap-2 text-white/20 text-[10px] font-bold uppercase tracking-[0.3em]">
-            <ShieldCheck className="h-3 w-3" /> Secure Checkout &bull; SSL Encrypted &bull; Razorpay Certified
+            <ShieldCheck className="h-3 w-3" /> Secure Checkout &bull; SSL Encrypted &bull; PCI Compliant
           </div>
         </footer>
       </div>
