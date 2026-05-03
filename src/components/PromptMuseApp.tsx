@@ -14,15 +14,27 @@ import {
   Stars,
   Cpu,
   Layers,
-  Box
+  Box,
+  Key,
+  Plus
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { PromptForm } from './PromptForm';
 import { PromptCard } from './PromptCard';
+import { InviteView } from './InviteView';
 import { usePromptsStore } from '@/hooks/use-prompts-store';
+import { useInviteStore } from '@/hooks/use-invite-store';
 import { Toaster } from '@/components/ui/toaster';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from '@/components/ui/dialog';
 
 export function PromptMuseApp() {
   const { 
@@ -34,8 +46,17 @@ export function PromptMuseApp() {
     clearAllPrompts
   } = usePromptsStore();
 
+  const {
+    isAuthorized,
+    validateCode,
+    generateNewCode,
+    logout
+  } = useInviteStore();
+
   const [scrolled, setScrolled] = useState(false);
-  const [view, setView] = useState<'landing' | 'studio'>('landing');
+  const [view, setView] = useState<'landing' | 'invite' | 'studio'>('landing');
+  const [lastGeneratedCode, setLastGeneratedCode] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,9 +66,20 @@ export function PromptMuseApp() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const openStudio = () => {
-    setView('studio');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Update view based on authorization if user tries to go to studio
+  useEffect(() => {
+    if (view === 'studio' && !isAuthorized) {
+      setView('landing');
+    }
+  }, [isAuthorized, view]);
+
+  const openStudioTrigger = () => {
+    if (isAuthorized) {
+      setView('studio');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setView('invite');
+    }
   };
 
   const closeStudio = () => {
@@ -55,7 +87,37 @@ export function PromptMuseApp() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleInviteSuccess = (code: string) => {
+    const success = validateCode(code);
+    if (success) {
+      setView('studio');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return true;
+    }
+    return false;
+  };
+
+  const handleGenerateCode = () => {
+    const code = generateNewCode();
+    setLastGeneratedCode(code);
+    toast({
+      title: "Invite Generated",
+      description: `New Access Key: ${code}`,
+    });
+  };
+
+  const copyGeneratedCode = () => {
+    if (lastGeneratedCode) {
+      navigator.clipboard.writeText(lastGeneratedCode);
+      toast({ title: "Copied to clipboard" });
+    }
+  };
+
   const favorites = prompts.filter(p => p.isFavorite);
+
+  if (view === 'invite') {
+    return <InviteView onBack={() => setView('landing')} onSuccess={handleInviteSuccess} />;
+  }
 
   if (view === 'studio') {
     return (
@@ -71,8 +133,39 @@ export function PromptMuseApp() {
             </div>
             
             <div className="flex items-center gap-4">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="rounded-full gap-2 border-white/10 bg-white/5 hover:bg-white/10 font-bold">
+                    <Key className="h-4 w-4 text-primary" /> Generate Key
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="studio-console border-white/10">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-black tracking-tighter">Access Key Generator</DialogTitle>
+                  </DialogHeader>
+                  <div className="p-8 space-y-6 text-center">
+                    <p className="text-white/40 text-sm">Create a new neural key for unauthorized peers.</p>
+                    {lastGeneratedCode ? (
+                      <div className="space-y-4">
+                        <div className="p-6 bg-white/[0.03] border border-white/5 rounded-2xl">
+                          <span className="text-3xl font-black tracking-[0.2em] text-primary">{lastGeneratedCode}</span>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button className="flex-1 rounded-xl font-bold" onClick={copyGeneratedCode}>Copy Key</Button>
+                          <Button variant="outline" className="flex-1 rounded-xl font-bold" onClick={handleGenerateCode}>Generate New</Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button onClick={handleGenerateCode} className="w-full h-14 rounded-xl font-black gap-2">
+                        <Plus className="h-5 w-5" /> Generate Access Key
+                      </Button>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+
               <Button variant="ghost" onClick={closeStudio} className="rounded-full gap-2 text-white/60 hover:text-white">
-                <ArrowLeft className="h-4 w-4" /> Exit Studio
+                <ArrowLeft className="h-4 w-4" /> Exit
               </Button>
             </div>
           </div>
@@ -170,7 +263,7 @@ export function PromptMuseApp() {
           <div className="hidden md:flex items-center gap-12 text-sm font-bold uppercase tracking-widest">
             <button className="text-white/40 hover:text-white transition-colors">Features</button>
             <button className="text-white/40 hover:text-white transition-colors">Showcase</button>
-            <Button onClick={openStudio} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-12 shadow-2xl">
+            <Button onClick={openStudioTrigger} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-12 shadow-2xl">
               Studio
             </Button>
           </div>
@@ -196,7 +289,7 @@ export function PromptMuseApp() {
             Unlock the true potential of AI models with structured, high-fidelity prompts designed for professional creators.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Button size="lg" onClick={openStudio} className="h-16 px-12 text-xl font-black rounded-3xl gap-3 bg-primary text-white hover:bg-primary/90 shadow-2xl shadow-primary/40 transition-all hover:scale-105">
+            <Button size="lg" onClick={openStudioTrigger} className="h-16 px-12 text-xl font-black rounded-3xl gap-3 bg-primary text-white hover:bg-primary/90 shadow-2xl shadow-primary/40 transition-all hover:scale-105">
               Launch Studio <ArrowRight className="h-6 w-6" />
             </Button>
             <Button size="lg" variant="outline" className="h-16 px-12 text-xl font-bold rounded-3xl border-white/10 hover:bg-white/5">
@@ -234,7 +327,7 @@ export function PromptMuseApp() {
           <p className="text-white/40 text-xl font-light mb-12 max-w-xl mx-auto">
             Join thousands of visual engineers crafting the future of digital art.
           </p>
-          <Button onClick={openStudio} className="h-16 px-12 text-xl font-black rounded-3xl bg-white text-black hover:bg-white/90">
+          <Button onClick={openStudioTrigger} className="h-16 px-12 text-xl font-black rounded-3xl bg-white text-black hover:bg-white/90">
             Open The Studio
           </Button>
         </div>
