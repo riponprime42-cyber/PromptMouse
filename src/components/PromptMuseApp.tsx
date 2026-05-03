@@ -19,7 +19,8 @@ import {
   Zap,
   MousePointer2,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  CreditCard
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -27,9 +28,11 @@ import { PromptForm } from './PromptForm';
 import { PromptCard } from './PromptCard';
 import { InviteView } from './InviteView';
 import { KeyGeneratorView } from './KeyGeneratorView';
+import { SubscriptionView } from './SubscriptionView';
 import { BrandLogo } from './BrandLogo';
 import { usePromptsStore } from '@/hooks/use-prompts-store';
 import { useInvite } from '@/hooks/use-invite-store';
+import { useSubscriptionStore, PLAN_LIMITS } from '@/hooks/use-subscription-store';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -49,8 +52,10 @@ export function PromptMuseApp() {
     logout
   } = useInvite();
 
+  const { plan } = useSubscriptionStore();
+
   const [scrolled, setScrolled] = useState(false);
-  const [view, setView] = useState<'landing' | 'invite' | 'studio' | 'generator'>('landing');
+  const [view, setView] = useState<'landing' | 'invite' | 'studio' | 'generator' | 'subscription'>('landing');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -62,7 +67,7 @@ export function PromptMuseApp() {
   }, []);
 
   useEffect(() => {
-    if ((view === 'studio' || view === 'generator') && !isAuthorized) {
+    if ((view === 'studio' || view === 'generator' || view === 'subscription') && !isAuthorized) {
       setView('landing');
     }
   }, [isAuthorized, view]);
@@ -107,6 +112,10 @@ export function PromptMuseApp() {
     return <KeyGeneratorView onBack={() => setView('studio')} onGoHome={closeStudio} />;
   }
 
+  if (view === 'subscription') {
+    return <SubscriptionView onBack={() => setView('studio')} />;
+  }
+
   if (view === 'studio') {
     return (
       <div className="min-h-screen bg-background selection:bg-primary/30 font-body animate-reveal">
@@ -118,6 +127,14 @@ export function PromptMuseApp() {
             </div>
             
             <div className="flex items-center gap-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setView('subscription')}
+                className="rounded-full gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black"
+              >
+                <CreditCard className="h-4 w-4" /> {PLAN_LIMITS[plan].label} Plan
+              </Button>
+
               <Button 
                 variant="outline" 
                 onClick={() => setView('generator')}
@@ -149,7 +166,10 @@ export function PromptMuseApp() {
                 <p className="text-white/40 text-lg font-light">Synthesize high-fidelity prompts for any creative vision.</p>
               </header>
               <div className="max-w-4xl">
-                <PromptForm onGenerated={(entry) => addPrompt(entry)} />
+                <PromptForm 
+                  onGenerated={(entry) => addPrompt(entry)} 
+                  onUpgradeRequest={() => setView('subscription')}
+                />
               </div>
             </div>
           </section>

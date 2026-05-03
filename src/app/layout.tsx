@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { InviteProvider } from '@/hooks/use-invite-store';
 import { Toaster } from '@/components/ui/toaster';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'PromptMuse | AI Image & Video Prompt Generator',
@@ -26,6 +27,11 @@ export default function RootLayout({
           {children}
           <Toaster />
         </InviteProvider>
+        <Script
+          id="razorpay-checkout-js"
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );
