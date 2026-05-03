@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Copy, Heart, Trash2, Edit3, Check, X, Maximize, Image as ImageIcon, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,7 +21,16 @@ export function PromptCard({ prompt, onUpdate, onToggleFavorite, onDelete }: Pro
   const [isEditing, setIsEditing] = useState(false);
   const [editedText, setEditedText] = useState(prompt.text);
   const [isCopied, setIsCopied] = useState(false);
+  const [formattedDate, setFormattedDate] = useState<string>('');
+  const [formattedTime, setFormattedTime] = useState<string>('');
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Format dates on the client to avoid hydration mismatch
+    const date = new Date(prompt.timestamp);
+    setFormattedDate(date.toLocaleDateString());
+    setFormattedTime(date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  }, [prompt.timestamp]);
 
   const handleCopy = async () => {
     try {
@@ -110,10 +119,10 @@ export function PromptCard({ prompt, onUpdate, onToggleFavorite, onDelete }: Pro
           <div className="flex flex-col">
             <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Saved To Vault</span>
             <span className="text-[10px] text-white/40">
-              {new Date(prompt.timestamp).toLocaleDateString()} &bull; {new Date(prompt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {formattedDate ? `${formattedDate} • ${formattedTime}` : 'Loading...'}
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="items-center gap-3 hidden sm:flex">
             <Button
               variant="ghost"
               size="icon"
@@ -139,6 +148,30 @@ export function PromptCard({ prompt, onUpdate, onToggleFavorite, onDelete }: Pro
               ) : (
                 <><Copy className="h-4 w-4" /> Copy Prompt</>
               )}
+            </Button>
+          </div>
+          <div className="flex sm:hidden items-center gap-2">
+             <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "h-8 w-8 rounded-full",
+                prompt.isFavorite ? "text-accent fill-accent" : "text-muted-foreground"
+              )}
+              onClick={() => onToggleFavorite(prompt.id)}
+            >
+              <Heart className={cn("h-4 w-4", prompt.isFavorite && "fill-current")} />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className={cn(
+                "h-8 w-8 rounded-full border-primary/30",
+                isCopied && "bg-primary/20 border-primary"
+              )}
+              onClick={handleCopy}
+            >
+              {isCopied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
             </Button>
           </div>
         </div>
