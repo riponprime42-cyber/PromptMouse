@@ -232,9 +232,10 @@ export function PromptMuseApp() {
             muted 
             loop 
             playsInline 
-            className="absolute top-1/2 left-1/2 min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-30 brightness-[0.4]"
+            poster="https://picsum.photos/seed/promptmuse-hero/1200/800"
+            className="absolute top-1/2 left-1/2 min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-40 brightness-[0.5]"
           >
-            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-lines-and-dots-in-blue-background-28681-large.mp4" type="video/mp4" />
+            <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
           <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
