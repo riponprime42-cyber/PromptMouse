@@ -15,7 +15,11 @@ import {
   Layers,
   Box,
   Key,
-  LogOut
+  LogOut,
+  Zap,
+  MousePointer2,
+  ShieldCheck,
+  ChevronDown
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -204,28 +208,33 @@ export function PromptMuseApp() {
 
   return (
     <div className="min-h-screen bg-background selection:bg-primary/30 font-body">
+      {/* Dynamic Navigation */}
       <nav className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-700",
-        scrolled ? "bg-background/60 backdrop-blur-2xl py-4 border-b border-white/5" : "bg-transparent py-8"
+        scrolled ? "bg-background/80 backdrop-blur-2xl py-4 border-b border-white/5" : "bg-transparent py-8"
       )}>
         <div className="max-w-7xl mx-auto px-8 flex items-center justify-between">
           <div className="flex items-center gap-4 cursor-pointer group">
-            <BrandLogo className="w-12 h-12 group-hover:rotate-12 transition-transform duration-500" />
-            <span className="text-2xl font-black tracking-tight">PromptMuse</span>
+            <BrandLogo className="w-10 h-10 group-hover:rotate-12 transition-transform duration-500" />
+            <span className="text-xl font-black tracking-tighter">PROMPTMUSE</span>
           </div>
 
-          <div className="hidden md:flex items-center gap-12 text-sm font-bold uppercase tracking-widest">
-            <button className="text-white/40 hover:text-white transition-colors" onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}>Features</button>
-            <Button onClick={openStudioTrigger} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-12 shadow-2xl">
-              Studio
+          <div className="hidden md:flex items-center gap-10">
+            <div className="flex items-center gap-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+              <button className="hover:text-primary transition-colors">Features</button>
+              <button className="hover:text-primary transition-colors">Neural Hub</button>
+              <button className="hover:text-primary transition-colors">Archive</button>
+            </div>
+            <Button onClick={openStudioTrigger} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-11 text-xs shadow-2xl transition-all active:scale-95">
+              Launch Studio
             </Button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section with Video Background */}
+      {/* Cinematic Hero Section */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-8 text-center overflow-hidden">
-        {/* Background Video Layer */}
+        {/* Immersive Video Layer */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-background">
           <video 
             autoPlay 
@@ -233,71 +242,171 @@ export function PromptMuseApp() {
             loop 
             playsInline 
             poster="https://picsum.photos/seed/promptmuse-hero/1200/800"
-            className="absolute top-1/2 left-1/2 min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-40 brightness-[0.5]"
+            className="absolute top-1/2 left-1/2 min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-30 brightness-[0.4]"
           >
             <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
-          <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
+          <div className="absolute inset-0 bg-primary/5 mix-blend-overlay" />
         </div>
 
-        <div className="relative z-10 max-w-4xl animate-reveal">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
-            <Stars className="h-4 w-4 text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Next-Gen Prompt Engineering</span>
+        <div className="relative z-10 max-w-5xl animate-reveal">
+          <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 mb-10 backdrop-blur-xl">
+            <Zap className="h-3.5 w-3.5 text-primary fill-primary" />
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60">v2.5 Neural Synthesis Engine Now Live</span>
           </div>
-          <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter leading-[0.85] mb-12 drop-shadow-2xl">
-            The Art Of <br />
-            <span className="text-primary italic">Precision.</span>
+          <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.9] mb-12 drop-shadow-2xl">
+            Precision <br />
+            <span className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] animate-pulse bg-clip-text text-transparent italic">Engineering.</span>
           </h1>
-          <p className="text-xl md:text-2xl text-white/60 max-w-2xl mx-auto font-light leading-relaxed mb-16 backdrop-blur-sm bg-black/10 rounded-3xl p-6">
-            Unlock the true potential of AI models with structured, high-fidelity prompts designed for professional creators.
+          <p className="text-lg md:text-xl text-white/40 max-w-2xl mx-auto font-light leading-relaxed mb-16 backdrop-blur-sm bg-black/5 rounded-3xl p-8 border border-white/5">
+            The professional standard for high-fidelity creative synthesis. PromptMuse empowers creators with scientific accuracy for image and video generation.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Button size="lg" onClick={openStudioTrigger} className="h-16 px-12 text-xl font-black rounded-3xl gap-3 bg-primary text-white hover:bg-primary/90 shadow-2xl shadow-primary/40 transition-all hover:scale-105">
-              Launch Studio <ArrowRight className="h-6 w-6" />
+            <Button size="lg" onClick={openStudioTrigger} className="h-16 px-12 text-lg font-black rounded-2xl gap-3 bg-primary text-white hover:bg-primary/90 shadow-[0_0_50px_rgba(59,130,246,0.3)] transition-all hover:scale-105 active:scale-95">
+              Access Studio <ArrowRight className="h-5 w-5" />
             </Button>
+            <Button size="lg" variant="ghost" className="h-16 px-10 text-lg font-black rounded-2xl border border-white/10 text-white/60 hover:text-white hover:bg-white/5 transition-all">
+              Watch Demo
+            </Button>
+          </div>
+          
+          <div className="mt-20 animate-bounce opacity-20">
+            <ChevronDown className="h-6 w-6 mx-auto" />
           </div>
         </div>
       </section>
 
-      {/* Feature Showcase Section */}
+      {/* Feature Grid: Neural Capabilities */}
       <section className="py-40 px-8 max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-16">
-          <FeatureCard 
-            icon={<Cpu className="h-8 w-8" />} 
-            title="Neural Synthesis" 
-            desc="Advanced algorithms tailored for the latest Gemini and Midjourney models." 
-          />
-          <FeatureCard 
-            icon={<Layers className="h-8 w-8" />} 
-            title="Precision Control" 
-            desc="Fine-tune medium, style, mood, and aspect ratio with scientific accuracy." 
-          />
-          <FeatureCard 
-            icon={<Box className="h-8 w-8" />} 
-            title="Artifact Vault" 
-            desc="Securely archive and iterate on your best creative engineering results." 
-          />
-        </div>
-      </section>
-
-      <section className="py-40 px-8">
-        <div className="max-w-5xl mx-auto rounded-[4rem] bg-gradient-to-br from-primary/20 via-primary/5 to-transparent p-20 text-center border border-primary/10 backdrop-blur-3xl">
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-8 italic">Ready to Begin?</h2>
-          <p className="text-white/40 text-xl font-light mb-12 max-w-xl mx-auto">
-            Join thousands of visual engineers crafting the future of digital art.
+        <div className="text-center mb-32 space-y-6">
+          <h2 className="text-[10px] font-black uppercase tracking-[0.6em] text-primary">Neural Core</h2>
+          <h3 className="text-4xl md:text-6xl font-black tracking-tighter italic">Engineered for Excellence.</h3>
+          <p className="text-white/30 text-lg max-w-xl mx-auto font-light leading-relaxed">
+            Our synthesis engine is built on advanced linguistic analysis and deep understanding of generative model parameters.
           </p>
-          <Button onClick={openStudioTrigger} className="h-16 px-12 text-xl font-black rounded-3xl bg-white text-black hover:bg-white/90 shadow-2xl">
-            Open The Studio
-          </Button>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          <FeatureCard 
+            icon={<Cpu className="h-7 w-7" />} 
+            title="Artifact Synthesis" 
+            desc="Construct complex creative payloads with multi-layered parameter controls." 
+          />
+          <FeatureCard 
+            icon={<Layers className="h-7 w-7" />} 
+            title="Atmosphere Mapping" 
+            desc="Scientific mapping of mood and lighting for perfect visual resonance." 
+          />
+          <FeatureCard 
+            icon={<Stars className="h-7 w-7" />} 
+            title="Influence Registry" 
+            desc="Integrate specific artistic references with weighted influence accuracy." 
+          />
         </div>
       </section>
 
-      <footer className="py-20 border-t border-white/5 text-center bg-black/20">
-        <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.5em]">
-          &copy; {new Date().getFullYear()} PROMPTMUSE STUDIO &bull; BUILT FOR CREATORS
-        </p>
+      {/* Visual Showcase: The Studio Experience */}
+      <section className="py-40 px-8">
+        <div className="max-w-7xl mx-auto studio-console p-10 md:p-24 bg-gradient-to-br from-white/[0.03] to-transparent border-white/5 relative overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/10 blur-[120px] rounded-full" />
+          
+          <div className="grid lg:grid-cols-2 gap-20 items-center relative z-10">
+            <div className="space-y-10">
+              <div className="space-y-4">
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-accent">Workflow Optimization</span>
+                <h3 className="text-5xl md:text-7xl font-black tracking-tighter leading-none italic">The Creator's <br />Vault.</h3>
+              </div>
+              <p className="text-white/40 text-xl font-light leading-relaxed">
+                PromptMuse provides a centralized workspace for your creative engineering. Save, iterate, and star your most effective synthesis results for rapid deployment.
+              </p>
+              <div className="flex flex-col gap-6">
+                <CheckItem text="Persistent history across sessions" />
+                <CheckItem text="Advanced filtering and star system" />
+                <CheckItem text="Instant clipboard synchronization" />
+                <CheckItem text="Medium-specific parameter injection" />
+              </div>
+              <Button onClick={openStudioTrigger} className="h-14 px-10 rounded-xl bg-white text-black font-black text-sm gap-3 group">
+                Enter The Vault <MousePointer2 className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </div>
+            
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-[3rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+              <div className="relative bg-background border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <div className="p-4 border-b border-white/5 bg-white/5 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500/50" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
+                    <div className="w-3 h-3 rounded-full bg-green-500/50" />
+                  </div>
+                  <div className="mx-auto text-[10px] font-black uppercase tracking-[0.4em] text-white/20">Studio Console v2.5</div>
+                </div>
+                <div className="p-8 space-y-6">
+                  <div className="h-4 w-3/4 bg-white/5 rounded-full" />
+                  <div className="h-32 w-full bg-white/[0.03] rounded-2xl border border-white/5" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="h-10 w-full bg-white/5 rounded-xl" />
+                    <div className="h-10 w-full bg-white/5 rounded-xl" />
+                  </div>
+                  <div className="h-14 w-full bg-primary/20 rounded-xl border border-primary/20" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Access Gateway: Final CTA */}
+      <section className="py-60 px-8 text-center relative">
+        <div className="max-w-4xl mx-auto space-y-12">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-[2.5rem] bg-primary/10 text-primary mb-4 animate-pulse">
+            <ShieldCheck className="h-12 w-12" />
+          </div>
+          <h2 className="text-5xl md:text-8xl font-black tracking-tighter italic">Protocol Initialized.</h2>
+          <p className="text-white/30 text-2xl font-light max-w-2xl mx-auto leading-relaxed">
+            Ready to synthesize your vision? Enter the PromptMuse Studio and unlock the future of creative engineering.
+          </p>
+          <div className="pt-10">
+            <Button onClick={openStudioTrigger} className="h-20 px-16 text-2xl font-black rounded-2xl bg-white text-black hover:bg-white/90 shadow-[0_0_80px_rgba(255,255,255,0.1)] transition-all hover:scale-105 active:scale-95">
+              Launch Master Studio
+            </Button>
+          </div>
+          <p className="text-[10px] text-white/10 font-bold uppercase tracking-[0.5em] mt-12">
+            Invite-only Neural Access Protocol Active
+          </p>
+        </div>
+      </section>
+
+      {/* Brand Footer */}
+      <footer className="py-24 border-t border-white/5 px-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+          <div className="flex flex-col items-center md:items-start gap-6">
+            <div className="flex items-center gap-4">
+              <BrandLogo className="w-10 h-10" glow={false} />
+              <span className="text-2xl font-black tracking-tighter">PROMPTMUSE</span>
+            </div>
+            <p className="text-white/20 text-xs font-medium uppercase tracking-[0.4em] max-w-xs text-center md:text-left leading-relaxed">
+              Leading the revolution in precision creative synthesis for the AI era.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-12">
+            <FooterCol title="Studio" items={["Launch", "Archive", "Key Vault"]} />
+            <FooterCol title="Protocol" items={["Security", "Privacy", "API"]} />
+            <FooterCol title="Social" items={["Twitter", "Discord", "Registry"]} />
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto mt-24 pt-12 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+          <p className="text-[10px] text-white/10 font-black uppercase tracking-[0.5em]">
+            &copy; {new Date().getFullYear()} PROMPTMUSE STUDIO &bull; BUILT BY CREATORS
+          </p>
+          <div className="flex items-center gap-8 text-[10px] text-white/10 font-bold uppercase tracking-[0.3em]">
+            <span>Neural V2.5.0</span>
+            <span>Registry active</span>
+          </div>
+        </div>
       </footer>
     </div>
   );
@@ -305,12 +414,37 @@ export function PromptMuseApp() {
 
 function FeatureCard({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
   return (
-    <div className="group p-10 rounded-[3rem] bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all backdrop-blur-sm">
-      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-8 group-hover:scale-110 transition-transform">
+    <div className="group p-10 rounded-[2.5rem] bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all backdrop-blur-sm relative overflow-hidden">
+      <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-10 group-hover:scale-110 transition-transform duration-500">
         {icon}
       </div>
-      <h3 className="text-2xl font-black mb-4 tracking-tight">{title}</h3>
-      <p className="text-white/40 leading-relaxed text-lg font-light">{desc}</p>
+      <h3 className="text-2xl font-black mb-4 tracking-tight italic">{title}</h3>
+      <p className="text-white/40 leading-relaxed text-base font-light">{desc}</p>
+    </div>
+  );
+}
+
+function CheckItem({ text }: { text: string }) {
+  return (
+    <div className="flex items-center gap-4 group">
+      <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_10px_rgba(59,130,246,0.5)] group-hover:scale-150 transition-transform" />
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">{text}</span>
+    </div>
+  );
+}
+
+function FooterCol({ title, items }: { title: string, items: string[] }) {
+  return (
+    <div className="flex flex-col gap-6">
+      <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">{title}</h4>
+      <div className="flex flex-col gap-3">
+        {items.map(item => (
+          <button key={item} className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 hover:text-primary transition-colors text-left">
+            {item}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
