@@ -123,31 +123,50 @@ export function PromptMuseApp() {
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-4 cursor-pointer group" onClick={closeStudio}>
               <BrandLogo className="w-10 h-10" glow={false} />
-              <span className="text-xl font-black tracking-tight">PromptMuse Studio</span>
+              <div className="flex flex-col">
+                <span className="text-xl font-black tracking-tight leading-none">PromptMuse Studio</span>
+                <span className="text-[9px] font-bold text-primary uppercase tracking-[0.2em] mt-1">Registry Alpha v2.5</span>
+              </div>
             </div>
             
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="outline" 
-                onClick={() => setView('subscription')}
-                className="rounded-full gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black"
-              >
-                <CreditCard className="h-4 w-4" /> {PLAN_LIMITS[plan].label} Plan
-              </Button>
+            <div className="flex items-center gap-6">
+              {/* Active Subscription Status Indicator */}
+              <div className="hidden md:flex items-center gap-3 px-5 py-2 rounded-full bg-primary/10 border border-primary/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]">
+                <Zap className={cn(
+                  "h-3.5 w-3.5",
+                  plan === 'free' ? "text-white/40" : "text-primary animate-pulse"
+                )} />
+                <div className="flex flex-col">
+                  <span className="text-[8px] font-black text-white/40 uppercase tracking-widest leading-none">Membership Protocol</span>
+                  <span className="text-[11px] font-black text-white uppercase tracking-wider">{PLAN_LIMITS[plan].label} Active</span>
+                </div>
+              </div>
 
-              <Button 
-                variant="outline" 
-                onClick={() => setView('generator')}
-                className="rounded-full gap-2 border-white/10 bg-white/5 hover:bg-white/10 font-bold"
-              >
-                <Key className="h-4 w-4 text-primary" /> Generate Key
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setView('subscription')}
+                  className="rounded-full gap-2 border-white/10 bg-white/5 hover:bg-white/10 font-bold"
+                  size="sm"
+                >
+                  <CreditCard className="h-4 w-4 text-accent" /> Manage Plan
+                </Button>
 
-              <div className="w-[1px] h-6 bg-white/10" />
+                <Button 
+                  variant="outline" 
+                  onClick={() => setView('generator')}
+                  className="rounded-full gap-2 border-white/10 bg-white/5 hover:bg-white/10 font-bold"
+                  size="sm"
+                >
+                  <Key className="h-4 w-4 text-primary" /> Key Vault
+                </Button>
 
-              <Button variant="ghost" onClick={handleLogout} className="rounded-full gap-2 text-white/40 hover:text-destructive hover:bg-destructive/10">
-                <LogOut className="h-4 w-4" /> Sign Out
-              </Button>
+                <div className="w-[1px] h-6 bg-white/10 mx-2" />
+
+                <Button variant="ghost" size="sm" onClick={handleLogout} className="rounded-full gap-2 text-white/40 hover:text-destructive hover:bg-destructive/10">
+                  <LogOut className="h-4 w-4" /> Sign Out
+                </Button>
+              </div>
             </div>
           </div>
         </nav>
