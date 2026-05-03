@@ -223,21 +223,33 @@ export function PromptMuseApp() {
         </div>
       </nav>
 
+      {/* Hero Section with Video Background */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-8 text-center overflow-hidden">
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-[600px] bg-primary/10 blur-[150px] rounded-full animate-pulse" />
+        {/* Background Video Layer */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <video 
+            autoPlay 
+            muted 
+            loop 
+            playsInline 
+            className="absolute top-1/2 left-1/2 min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-20 brightness-50"
+          >
+            <source src="https://cdn.pixabay.com/vimeo/457497184/digital-22744.mp4?width=1280&hash=85605d39894e63f90558b3a093259885871f39f3" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
+          <div className="absolute inset-0 bg-primary/5 mix-blend-overlay" />
         </div>
 
         <div className="relative z-10 max-w-4xl animate-reveal">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
             <Stars className="h-4 w-4 text-primary" />
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Next-Gen Prompt Engineering</span>
           </div>
-          <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter leading-[0.85] mb-12">
+          <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter leading-[0.85] mb-12 drop-shadow-2xl">
             The Art Of <br />
             <span className="text-primary italic">Precision.</span>
           </h1>
-          <p className="text-xl md:text-2xl text-white/40 max-w-2xl mx-auto font-light leading-relaxed mb-16">
+          <p className="text-xl md:text-2xl text-white/60 max-w-2xl mx-auto font-light leading-relaxed mb-16 backdrop-blur-sm bg-black/10 rounded-3xl p-6">
             Unlock the true potential of AI models with structured, high-fidelity prompts designed for professional creators.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
@@ -248,6 +260,7 @@ export function PromptMuseApp() {
         </div>
       </section>
 
+      {/* Feature Showcase Section */}
       <section className="py-40 px-8 max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-16">
           <FeatureCard 
@@ -269,18 +282,18 @@ export function PromptMuseApp() {
       </section>
 
       <section className="py-40 px-8">
-        <div className="max-w-5xl mx-auto rounded-[4rem] bg-gradient-to-br from-primary/20 via-primary/5 to-transparent p-20 text-center border border-primary/10">
+        <div className="max-w-5xl mx-auto rounded-[4rem] bg-gradient-to-br from-primary/20 via-primary/5 to-transparent p-20 text-center border border-primary/10 backdrop-blur-3xl">
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-8 italic">Ready to Begin?</h2>
           <p className="text-white/40 text-xl font-light mb-12 max-w-xl mx-auto">
             Join thousands of visual engineers crafting the future of digital art.
           </p>
-          <Button onClick={openStudioTrigger} className="h-16 px-12 text-xl font-black rounded-3xl bg-white text-black hover:bg-white/90">
+          <Button onClick={openStudioTrigger} className="h-16 px-12 text-xl font-black rounded-3xl bg-white text-black hover:bg-white/90 shadow-2xl">
             Open The Studio
           </Button>
         </div>
       </section>
 
-      <footer className="py-20 border-t border-white/5 text-center">
+      <footer className="py-20 border-t border-white/5 text-center bg-black/20">
         <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.5em]">
           &copy; {new Date().getFullYear()} PROMPTMUSE STUDIO &bull; BUILT FOR CREATORS
         </p>
@@ -291,7 +304,7 @@ export function PromptMuseApp() {
 
 function FeatureCard({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
   return (
-    <div className="group p-10 rounded-[3rem] bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all">
+    <div className="group p-10 rounded-[3rem] bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all backdrop-blur-sm">
       <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-8 group-hover:scale-110 transition-transform">
         {icon}
       </div>
