@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -16,7 +17,8 @@ import {
   Box,
   Key,
   Plus,
-  LogOut
+  LogOut,
+  UserCircle
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -79,6 +81,12 @@ export function PromptMuseApp() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleLogout = () => {
+    logout();
+    setView('landing');
+    toast({ title: "Logged Out", description: "Your neural session has ended." });
+  };
+
   const handleInviteSuccess = (code: string) => {
     const success = validateCode(code);
     if (success) {
@@ -96,7 +104,7 @@ export function PromptMuseApp() {
   }
 
   if (view === 'generator') {
-    return <KeyGeneratorView onBack={() => setView('studio')} />;
+    return <KeyGeneratorView onBack={() => setView('studio')} onGoHome={closeStudio} />;
   }
 
   if (view === 'studio') {
@@ -121,8 +129,10 @@ export function PromptMuseApp() {
                 <Key className="h-4 w-4 text-primary" /> Generate Key
               </Button>
 
-              <Button variant="ghost" onClick={closeStudio} className="rounded-full gap-2 text-white/60 hover:text-white">
-                <ArrowLeft className="h-4 w-4" /> Exit
+              <div className="w-[1px] h-6 bg-white/10" />
+
+              <Button variant="ghost" onClick={handleLogout} className="rounded-full gap-2 text-white/40 hover:text-destructive hover:bg-destructive/10">
+                <LogOut className="h-4 w-4" /> Sign Out
               </Button>
             </div>
           </div>
@@ -218,8 +228,7 @@ export function PromptMuseApp() {
           </div>
 
           <div className="hidden md:flex items-center gap-12 text-sm font-bold uppercase tracking-widest">
-            <button className="text-white/40 hover:text-white transition-colors">Features</button>
-            <button className="text-white/40 hover:text-white transition-colors">Showcase</button>
+            <button className="text-white/40 hover:text-white transition-colors" onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}>Features</button>
             <Button onClick={openStudioTrigger} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-12 shadow-2xl">
               Studio
             </Button>
@@ -248,9 +257,6 @@ export function PromptMuseApp() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <Button size="lg" onClick={openStudioTrigger} className="h-16 px-12 text-xl font-black rounded-3xl gap-3 bg-primary text-white hover:bg-primary/90 shadow-2xl shadow-primary/40 transition-all hover:scale-105">
               Launch Studio <ArrowRight className="h-6 w-6" />
-            </Button>
-            <Button size="lg" variant="outline" className="h-16 px-12 text-xl font-bold rounded-3xl border-white/10 hover:bg-white/5">
-              View Showcase
             </Button>
           </div>
         </div>

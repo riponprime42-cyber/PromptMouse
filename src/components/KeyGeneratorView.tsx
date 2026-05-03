@@ -1,7 +1,8 @@
+
 "use client";
 
 import React, { useState } from 'react';
-import { Key, ArrowLeft, Loader2, Plus, Copy, Check, ShieldCheck, Stars } from 'lucide-react';
+import { Key, ArrowLeft, Loader2, Plus, Copy, Check, ShieldCheck, Stars, Home, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useInviteStore } from '@/hooks/use-invite-store';
@@ -10,10 +11,11 @@ import { cn } from '@/lib/utils';
 
 interface KeyGeneratorViewProps {
   onBack: () => void;
+  onGoHome: () => void;
 }
 
-export function KeyGeneratorView({ onBack }: KeyGeneratorViewProps) {
-  const { generateNewCode } = useInviteStore();
+export function KeyGeneratorView({ onBack, onGoHome }: KeyGeneratorViewProps) {
+  const { generateNewCode, logout } = useInviteStore();
   const { toast } = useToast();
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,19 +46,37 @@ export function KeyGeneratorView({ onBack }: KeyGeneratorViewProps) {
     }
   };
 
+  const handleCopyAndGoHome = () => {
+    if (generatedKey) {
+      navigator.clipboard.writeText(generatedKey);
+      toast({ title: "Key Copied & Logged Out", description: "Test your key on the landing page." });
+      logout();
+      onGoHome();
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-background relative overflow-hidden animate-reveal">
       {/* Dynamic background elements */}
       <div className="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[150px] rounded-full pointer-events-none" />
       <div className="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/5 blur-[150px] rounded-full pointer-events-none" />
 
-      <Button 
-        variant="ghost" 
-        onClick={onBack} 
-        className="absolute top-8 left-8 rounded-full gap-2 text-white/40 hover:text-white z-10"
-      >
-        <ArrowLeft className="h-4 w-4" /> Back to Studio
-      </Button>
+      <div className="absolute top-8 left-8 flex items-center gap-4 z-10">
+        <Button 
+          variant="ghost" 
+          onClick={onBack} 
+          className="rounded-full gap-2 text-white/40 hover:text-white"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back to Studio
+        </Button>
+        <Button 
+          variant="ghost" 
+          onClick={onGoHome} 
+          className="rounded-full gap-2 text-white/40 hover:text-white"
+        >
+          <Home className="h-4 w-4" /> Go Home
+        </Button>
+      </div>
 
       <div className="w-full max-w-2xl space-y-12 relative z-10">
         <header className="text-center space-y-6">
@@ -110,23 +130,33 @@ export function KeyGeneratorView({ onBack }: KeyGeneratorViewProps) {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Button 
+                      onClick={handleCopy}
+                      className={cn(
+                        "h-16 rounded-2xl font-black text-lg gap-3 transition-all",
+                        copied ? "bg-accent hover:bg-accent/90" : "bg-white text-black hover:bg-white/90"
+                      )}
+                    >
+                      {copied ? <><Check className="h-6 w-6" /> Key Copied</> : <><Copy className="h-6 w-6" /> Copy Key</>}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleGenerate}
+                      disabled={isLoading}
+                      className="h-16 rounded-2xl border-white/10 hover:bg-white/5 font-bold text-lg text-white"
+                    >
+                      Generate Another
+                    </Button>
+                  </div>
+                  
                   <Button 
-                    onClick={handleCopy}
-                    className={cn(
-                      "h-16 rounded-2xl font-black text-lg gap-3 transition-all",
-                      copied ? "bg-accent hover:bg-accent/90" : "bg-white text-black hover:bg-white/90"
-                    )}
+                    variant="ghost" 
+                    onClick={handleCopyAndGoHome}
+                    className="h-16 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 font-black text-lg gap-3 text-white/80"
                   >
-                    {copied ? <><Check className="h-6 w-6" /> Key Copied</> : <><Copy className="h-6 w-6" /> Copy Key</>}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={handleGenerate}
-                    disabled={isLoading}
-                    className="h-16 rounded-2xl border-white/10 hover:bg-white/5 font-bold text-lg"
-                  >
-                    Generate Another
+                    <LogOut className="h-6 w-6" /> Copy & Go Home to Test
                   </Button>
                 </div>
 
