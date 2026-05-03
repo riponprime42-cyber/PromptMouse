@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -16,25 +15,20 @@ import {
   Layers,
   Box,
   Key,
-  Plus
+  Plus,
+  LogOut
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { PromptForm } from './PromptForm';
 import { PromptCard } from './PromptCard';
 import { InviteView } from './InviteView';
+import { KeyGeneratorView } from './KeyGeneratorView';
 import { usePromptsStore } from '@/hooks/use-prompts-store';
 import { useInviteStore } from '@/hooks/use-invite-store';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
 
 export function PromptMuseApp() {
   const { 
@@ -49,13 +43,11 @@ export function PromptMuseApp() {
   const {
     isAuthorized,
     validateCode,
-    generateNewCode,
     logout
   } = useInviteStore();
 
   const [scrolled, setScrolled] = useState(false);
-  const [view, setView] = useState<'landing' | 'invite' | 'studio'>('landing');
-  const [lastGeneratedCode, setLastGeneratedCode] = useState<string | null>(null);
+  const [view, setView] = useState<'landing' | 'invite' | 'studio' | 'generator'>('landing');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -68,7 +60,7 @@ export function PromptMuseApp() {
 
   // Update view based on authorization if user tries to go to studio
   useEffect(() => {
-    if (view === 'studio' && !isAuthorized) {
+    if ((view === 'studio' || view === 'generator') && !isAuthorized) {
       setView('landing');
     }
   }, [isAuthorized, view]);
@@ -97,26 +89,14 @@ export function PromptMuseApp() {
     return false;
   };
 
-  const handleGenerateCode = () => {
-    const code = generateNewCode();
-    setLastGeneratedCode(code);
-    toast({
-      title: "Invite Generated",
-      description: `New Access Key: ${code}`,
-    });
-  };
-
-  const copyGeneratedCode = () => {
-    if (lastGeneratedCode) {
-      navigator.clipboard.writeText(lastGeneratedCode);
-      toast({ title: "Copied to clipboard" });
-    }
-  };
-
   const favorites = prompts.filter(p => p.isFavorite);
 
   if (view === 'invite') {
     return <InviteView onBack={() => setView('landing')} onSuccess={handleInviteSuccess} />;
+  }
+
+  if (view === 'generator') {
+    return <KeyGeneratorView onBack={() => setView('studio')} />;
   }
 
   if (view === 'studio') {
@@ -133,36 +113,13 @@ export function PromptMuseApp() {
             </div>
             
             <div className="flex items-center gap-4">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="rounded-full gap-2 border-white/10 bg-white/5 hover:bg-white/10 font-bold">
-                    <Key className="h-4 w-4 text-primary" /> Generate Key
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="studio-console border-white/10">
-                  <DialogHeader>
-                    <DialogTitle className="text-2xl font-black tracking-tighter">Access Key Generator</DialogTitle>
-                  </DialogHeader>
-                  <div className="p-8 space-y-6 text-center">
-                    <p className="text-white/40 text-sm">Create a new neural key for unauthorized peers.</p>
-                    {lastGeneratedCode ? (
-                      <div className="space-y-4">
-                        <div className="p-6 bg-white/[0.03] border border-white/5 rounded-2xl">
-                          <span className="text-3xl font-black tracking-[0.2em] text-primary">{lastGeneratedCode}</span>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button className="flex-1 rounded-xl font-bold" onClick={copyGeneratedCode}>Copy Key</Button>
-                          <Button variant="outline" className="flex-1 rounded-xl font-bold" onClick={handleGenerateCode}>Generate New</Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <Button onClick={handleGenerateCode} className="w-full h-14 rounded-xl font-black gap-2">
-                        <Plus className="h-5 w-5" /> Generate Access Key
-                      </Button>
-                    )}
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <Button 
+                variant="outline" 
+                onClick={() => setView('generator')}
+                className="rounded-full gap-2 border-white/10 bg-white/5 hover:bg-white/10 font-bold"
+              >
+                <Key className="h-4 w-4 text-primary" /> Generate Key
+              </Button>
 
               <Button variant="ghost" onClick={closeStudio} className="rounded-full gap-2 text-white/60 hover:text-white">
                 <ArrowLeft className="h-4 w-4" /> Exit
