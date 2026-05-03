@@ -18,6 +18,7 @@ import { generateCreativePrompt } from '@/ai/flows/generate-creative-prompt';
 import { PromptEntry } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useSubscriptionStore, PLAN_LIMITS } from '@/hooks/use-subscription-store';
+import { cn } from '@/lib/utils';
 
 const STYLES = [
   "Photorealistic", "Digital Art", "Cyberpunk", "Fantasy Art", "Impressionistic", 
