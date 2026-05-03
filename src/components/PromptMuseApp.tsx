@@ -10,15 +10,12 @@ import {
   ArrowRight, 
   Wand2, 
   CircleDot, 
-  ArrowLeft, 
   Stars,
   Cpu,
   Layers,
   Box,
   Key,
-  Plus,
-  LogOut,
-  UserCircle
+  LogOut
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -27,8 +24,7 @@ import { PromptCard } from './PromptCard';
 import { InviteView } from './InviteView';
 import { KeyGeneratorView } from './KeyGeneratorView';
 import { usePromptsStore } from '@/hooks/use-prompts-store';
-import { useInviteStore } from '@/hooks/use-invite-store';
-import { Toaster } from '@/components/ui/toaster';
+import { useInvite } from '@/hooks/use-invite-store';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -46,7 +42,7 @@ export function PromptMuseApp() {
     isAuthorized,
     validateCode,
     logout
-  } = useInviteStore();
+  } = useInvite();
 
   const [scrolled, setScrolled] = useState(false);
   const [view, setView] = useState<'landing' | 'invite' | 'studio' | 'generator'>('landing');
@@ -60,7 +56,6 @@ export function PromptMuseApp() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Update view based on authorization if user tries to go to studio
   useEffect(() => {
     if ((view === 'studio' || view === 'generator') && !isAuthorized) {
       setView('landing');
@@ -110,7 +105,6 @@ export function PromptMuseApp() {
   if (view === 'studio') {
     return (
       <div className="min-h-screen bg-background selection:bg-primary/30 font-body animate-reveal">
-        {/* Studio Navbar */}
         <nav className="sticky top-0 z-50 bg-background/60 backdrop-blur-2xl py-4 border-b border-white/5 px-8">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3 cursor-pointer group" onClick={closeStudio}>
@@ -139,7 +133,6 @@ export function PromptMuseApp() {
         </nav>
 
         <main className="max-w-6xl mx-auto px-8 py-20 space-y-32">
-          {/* Studio Workspace */}
           <section className="studio-console p-10 md:p-16 relative">
             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
               <CircleDot className="h-48 w-48 text-primary" />
@@ -158,7 +151,6 @@ export function PromptMuseApp() {
             </div>
           </section>
 
-          {/* Vault */}
           <section className="space-y-16 pb-20">
             <Tabs defaultValue="history" className="w-full">
               <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
@@ -207,14 +199,12 @@ export function PromptMuseApp() {
             </Tabs>
           </section>
         </main>
-        <Toaster />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background selection:bg-primary/30 font-body">
-      {/* Landing Navbar */}
       <nav className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-700",
         scrolled ? "bg-background/60 backdrop-blur-2xl py-4 border-b border-white/5" : "bg-transparent py-8"
@@ -236,7 +226,6 @@ export function PromptMuseApp() {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-8 text-center overflow-hidden">
         <div className="absolute inset-0 z-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-[600px] bg-primary/10 blur-[150px] rounded-full animate-pulse" />
@@ -262,7 +251,6 @@ export function PromptMuseApp() {
         </div>
       </section>
 
-      {/* Feature Grid */}
       <section className="py-40 px-8 max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-16">
           <FeatureCard 
@@ -283,7 +271,6 @@ export function PromptMuseApp() {
         </div>
       </section>
 
-      {/* Final CTA */}
       <section className="py-40 px-8">
         <div className="max-w-5xl mx-auto rounded-[4rem] bg-gradient-to-br from-primary/20 via-primary/5 to-transparent p-20 text-center border border-primary/10">
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-8 italic">Ready to Begin?</h2>
@@ -296,13 +283,11 @@ export function PromptMuseApp() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-20 border-t border-white/5 text-center">
         <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.5em]">
           &copy; {new Date().getFullYear()} PROMPTMUSE STUDIO &bull; BUILT FOR CREATORS
         </p>
       </footer>
-      <Toaster />
     </div>
   );
 }

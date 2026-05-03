@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { Key, ArrowLeft, Loader2, Plus, Copy, Check, ShieldCheck, Stars, Home, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useInviteStore } from '@/hooks/use-invite-store';
+import { useInvite } from '@/hooks/use-invite-store';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ interface KeyGeneratorViewProps {
 }
 
 export function KeyGeneratorView({ onBack, onGoHome }: KeyGeneratorViewProps) {
-  const { generateNewCode, logout } = useInviteStore();
+  const { generateNewCode, logout } = useInvite();
   const { toast } = useToast();
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +57,6 @@ export function KeyGeneratorView({ onBack, onGoHome }: KeyGeneratorViewProps) {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-background relative overflow-hidden animate-reveal">
-      {/* Dynamic background elements */}
       <div className="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[150px] rounded-full pointer-events-none" />
       <div className="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/5 blur-[150px] rounded-full pointer-events-none" />
 
