@@ -226,18 +226,18 @@ export function PromptMuseApp() {
       {/* Hero Section with Video Background */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-8 text-center overflow-hidden">
         {/* Background Video Layer */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-background">
           <video 
             autoPlay 
             muted 
             loop 
             playsInline 
-            className="absolute top-1/2 left-1/2 min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-20 brightness-50"
+            className="absolute top-1/2 left-1/2 min-w-full min-h-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-30 brightness-[0.4]"
           >
-            <source src="https://cdn.pixabay.com/vimeo/457497184/digital-22744.mp4?width=1280&hash=85605d39894e63f90558b3a093259885871f39f3" type="video/mp4" />
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-lines-and-dots-in-blue-background-28681-large.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
-          <div className="absolute inset-0 bg-primary/5 mix-blend-overlay" />
+          <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
         </div>
 
         <div className="relative z-10 max-w-4xl animate-reveal">
