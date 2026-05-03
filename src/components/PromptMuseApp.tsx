@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { 
   Sparkles, 
   History, 
@@ -27,6 +28,7 @@ import { usePromptsStore } from '@/hooks/use-prompts-store';
 import { useInvite } from '@/hooks/use-invite-store';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function PromptMuseApp() {
   const { 
@@ -47,6 +49,8 @@ export function PromptMuseApp() {
   const [scrolled, setScrolled] = useState(false);
   const [view, setView] = useState<'landing' | 'invite' | 'studio' | 'generator'>('landing');
   const { toast } = useToast();
+
+  const brandLogo = PlaceHolderImages.find(img => img.id === 'brand-logo');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -107,9 +111,17 @@ export function PromptMuseApp() {
       <div className="min-h-screen bg-background selection:bg-primary/30 font-body animate-reveal">
         <nav className="sticky top-0 z-50 bg-background/60 backdrop-blur-2xl py-4 border-b border-white/5 px-8">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-3 cursor-pointer group" onClick={closeStudio}>
-              <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-xl shadow-lg shadow-primary/20">
-                <Sparkles className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-4 cursor-pointer group" onClick={closeStudio}>
+              <div className="relative w-10 h-10 overflow-hidden rounded-xl border border-white/10 shadow-lg shadow-primary/20">
+                {brandLogo && (
+                  <Image 
+                    src={brandLogo.imageUrl} 
+                    alt="PromptMuse Logo" 
+                    fill 
+                    className="object-cover"
+                    data-ai-hint={brandLogo.imageHint}
+                  />
+                )}
               </div>
               <span className="text-xl font-black tracking-tight">PromptMuse Studio</span>
             </div>
@@ -210,9 +222,17 @@ export function PromptMuseApp() {
         scrolled ? "bg-background/60 backdrop-blur-2xl py-4 border-b border-white/5" : "bg-transparent py-8"
       )}>
         <div className="max-w-7xl mx-auto px-8 flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer group">
-            <div className="w-11 h-11 bg-primary flex items-center justify-center rounded-2xl shadow-[0_0_30px_rgba(59,130,246,0.4)] group-hover:rotate-12 transition-transform">
-              <Sparkles className="h-5 w-5 text-white" />
+          <div className="flex items-center gap-4 cursor-pointer group">
+            <div className="relative w-11 h-11 overflow-hidden rounded-2xl shadow-[0_0_30px_rgba(59,130,246,0.4)] group-hover:rotate-12 transition-transform">
+              {brandLogo && (
+                <Image 
+                  src={brandLogo.imageUrl} 
+                  alt="PromptMuse Logo" 
+                  fill 
+                  className="object-cover"
+                  data-ai-hint={brandLogo.imageHint}
+                />
+              )}
             </div>
             <span className="text-2xl font-black tracking-tight">PromptMuse</span>
           </div>

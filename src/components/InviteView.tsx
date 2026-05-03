@@ -2,11 +2,13 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Key, ArrowLeft, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowLeft, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 interface InviteViewProps {
   onBack: () => void;
@@ -18,6 +20,8 @@ export function InviteView({ onBack, onSuccess }: InviteViewProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
   const { toast } = useToast();
+
+  const brandLogo = PlaceHolderImages.find(img => img.id === 'brand-logo');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,8 +60,17 @@ export function InviteView({ onBack, onSuccess }: InviteViewProps) {
       <Card className="w-full max-w-md studio-console p-1 relative z-10">
         <CardContent className="p-10 space-y-8">
           <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 border border-white/10 text-primary mb-2">
-              <Key className="h-8 w-8" />
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-white/5 border border-white/10 overflow-hidden mb-2">
+              {brandLogo && (
+                <Image 
+                  src={brandLogo.imageUrl} 
+                  alt="PromptMuse Logo" 
+                  width={80} 
+                  height={80} 
+                  className="object-cover"
+                  data-ai-hint={brandLogo.imageHint}
+                />
+              )}
             </div>
             <h1 className="text-4xl font-black tracking-tighter">Access Required.</h1>
             <p className="text-white/40 text-sm font-light uppercase tracking-widest">

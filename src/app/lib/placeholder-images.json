@@ -8,6 +8,12 @@
       "imageHint": "abstract digital"
     },
     {
+      "id": "brand-logo",
+      "description": "AI Muse digital art icon with neural glow",
+      "imageUrl": "https://picsum.photos/seed/muse-icon/200/200",
+      "imageHint": "AI goddess"
+    },
+    {
       "id": "style-fantasy",
       "description": "Fantasy landscape example",
       "imageUrl": "https://picsum.photos/seed/fantasy/400/300",
