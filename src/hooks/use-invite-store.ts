@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -18,7 +17,7 @@ interface InviteContextType {
 const InviteContext = createContext<InviteContextType | undefined>(undefined);
 
 export function InviteProvider({ children }: { children: React.ReactNode }) {
-  const [validCodes, setValidCodes] = useState<string[]>(['MUSE-2025']);
+  const [validCodes, setValidCodes] = useState<string[]>(['MUSE-2026']);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -32,7 +31,7 @@ export function InviteProvider({ children }: { children: React.ReactNode }) {
         const parsed = JSON.parse(savedCodes);
         if (Array.isArray(parsed)) {
           // Merge with default code if not present
-          const merged = Array.from(new Set(['MUSE-2025', ...parsed]));
+          const merged = Array.from(new Set(['MUSE-2026', ...parsed]));
           setValidCodes(merged);
         }
       } catch (e) {
