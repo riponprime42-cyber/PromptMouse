@@ -19,7 +19,8 @@ import {
   Zap,
   MousePointer2,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  Send
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -245,6 +246,16 @@ export function PromptMuseApp() {
               <button className="hover:text-primary transition-colors">Neural Hub</button>
               <button className="hover:text-primary transition-colors">Archive</button>
             </div>
+            
+            <a 
+              href="https://t.me/ALVITEACH" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-accent hover:text-white transition-colors"
+            >
+              <Send className="h-3.5 w-3.5" /> Invite Code
+            </a>
+
             <Button onClick={openStudioTrigger} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-11 text-xs shadow-2xl transition-all active:scale-95">
               Launch Studio
             </Button>
