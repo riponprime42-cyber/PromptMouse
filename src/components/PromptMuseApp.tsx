@@ -27,6 +27,7 @@ import { PromptForm } from './PromptForm';
 import { PromptCard } from './PromptCard';
 import { InviteView } from './InviteView';
 import { KeyGeneratorView } from './KeyGeneratorView';
+import { LoadingView } from './LoadingView';
 import { BrandLogo } from './BrandLogo';
 import { usePromptsStore } from '@/hooks/use-prompts-store';
 import { useInvite } from '@/hooks/use-invite-store';
@@ -50,7 +51,7 @@ export function PromptMuseApp() {
   } = useInvite();
 
   const [scrolled, setScrolled] = useState(false);
-  const [view, setView] = useState<'landing' | 'invite' | 'studio' | 'generator'>('landing');
+  const [view, setView] = useState<'landing' | 'invite' | 'studio' | 'generator' | 'loading'>('landing');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -62,15 +63,23 @@ export function PromptMuseApp() {
   }, []);
 
   useEffect(() => {
-    if ((view === 'studio' || view === 'generator') && !isAuthorized) {
+    if ((view === 'studio' || view === 'generator' || view === 'loading') && !isAuthorized) {
       setView('landing');
     }
   }, [isAuthorized, view]);
 
+  const startLoading = (targetView: 'studio' | 'generator') => {
+    setView('loading');
+    // Artificial delay for premium neural feel
+    setTimeout(() => {
+      setView(targetView);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 2000);
+  };
+
   const openStudioTrigger = () => {
     if (isAuthorized) {
-      setView('studio');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      startLoading('studio');
     } else {
       setView('invite');
     }
@@ -90,14 +99,17 @@ export function PromptMuseApp() {
   const handleInviteSuccess = (code: string) => {
     const success = validateCode(code);
     if (success) {
-      setView('studio');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      startLoading('studio');
       return true;
     }
     return false;
   };
 
   const favorites = prompts.filter(p => p.isFavorite);
+
+  if (view === 'loading') {
+    return <LoadingView />;
+  }
 
   if (view === 'invite') {
     return <InviteView onBack={() => setView('landing')} onSuccess={handleInviteSuccess} />;
@@ -204,7 +216,7 @@ export function PromptMuseApp() {
                     <PromptCard key={p.id} prompt={p} onUpdate={updatePrompt} onToggleFavorite={toggleFavorite} onDelete={deletePrompt} />
                   ))
                 ) : (
-                  <EmptyState icon={<Heart className="h-16 w-16" />} title="No Favorites" desc="Star your best prompts for quick access." />
+                  <EmptyState icon={<History className="h-16 w-16" />} title="No Favorites" desc="Star your best prompts for quick access." />
                 )}
               </TabsContent>
             </Tabs>
@@ -398,6 +410,7 @@ export function PromptMuseApp() {
             <p className="text-white/20 text-xs font-medium uppercase tracking-[0.4em] max-w-xs text-center md:text-left leading-relaxed">
               Leading the revolution in precision creative synthesis for the AI era.
             </p>
+            <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-white/10">made by ALVISONGS</p>
           </div>
 
           <div className="flex items-center gap-12">
