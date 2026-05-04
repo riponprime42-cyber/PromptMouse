@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Sparkles, Loader2, Image as ImageIcon, Video, Maximize, AlertCircle, ArrowUpCircle } from 'lucide-react';
+import { Sparkles, Loader2, Image as ImageIcon, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,7 +17,6 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { generateCreativePrompt } from '@/ai/flows/generate-creative-prompt';
 import { PromptEntry } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { useSubscriptionStore, PLAN_LIMITS } from '@/hooks/use-subscription-store';
 import { cn } from '@/lib/utils';
 
 const STYLES = [
@@ -36,13 +35,11 @@ const ASPECT_RATIOS = [
 
 interface PromptFormProps {
   onGenerated: (entry: PromptEntry) => void;
-  onUpgradeRequest: () => void;
 }
 
-export function PromptForm({ onGenerated, onUpgradeRequest }: PromptFormProps) {
+export function PromptForm({ onGenerated }: PromptFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { canGenerate, incrementUsage, getRemaining, plan } = useSubscriptionStore();
   const [formData, setFormData] = useState({
     subject: '',
     style: 'Photorealistic',
@@ -52,22 +49,9 @@ export function PromptForm({ onGenerated, onUpgradeRequest }: PromptFormProps) {
     references: '',
   });
 
-  const remaining = getRemaining(formData.medium);
-  const hasLimit = typeof remaining === 'number' && remaining <= 0;
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.subject) return;
-
-    if (!canGenerate(formData.medium)) {
-      toast({
-        title: "Limit Reached",
-        description: `Your current ${PLAN_LIMITS[plan].label} plan has reached its ${formData.medium} limit.`,
-        variant: "destructive",
-      });
-      onUpgradeRequest();
-      return;
-    }
 
     setIsLoading(true);
     try {
@@ -95,7 +79,6 @@ export function PromptForm({ onGenerated, onUpgradeRequest }: PromptFormProps) {
         }
       };
 
-      incrementUsage(formData.medium);
       onGenerated(newEntry);
       setFormData(prev => ({ ...prev, subject: '' }));
       
@@ -133,25 +116,6 @@ export function PromptForm({ onGenerated, onUpgradeRequest }: PromptFormProps) {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-        </div>
-
-        <div className="flex flex-col items-end gap-2">
-          <div className={cn(
-            "px-4 py-2 rounded-xl border flex items-center gap-2",
-            hasLimit ? "bg-destructive/10 border-destructive/20 text-destructive" : "bg-primary/10 border-primary/20 text-primary"
-          )}>
-            <span className="text-[8px] font-black uppercase tracking-widest">Neural Credits:</span>
-            <span className="text-xs font-black">{remaining}</span>
-          </div>
-          {hasLimit && (
-            <button 
-              type="button"
-              onClick={onUpgradeRequest}
-              className="text-[8px] font-black uppercase tracking-widest text-accent hover:underline flex items-center gap-1"
-            >
-              Request Upgrade <ArrowUpCircle className="h-3 w-3" />
-            </button>
-          )}
         </div>
       </div>
 
@@ -233,18 +197,14 @@ export function PromptForm({ onGenerated, onUpgradeRequest }: PromptFormProps) {
 
       <Button
         type="submit"
-        disabled={isLoading || !formData.subject || hasLimit}
+        disabled={isLoading || !formData.subject}
         className={cn(
           "w-full h-20 text-xl font-black gap-4 shadow-2xl transition-all rounded-3xl",
-          hasLimit 
-            ? "bg-white/5 text-white/20 cursor-not-allowed border border-white/5" 
-            : "bg-primary hover:bg-primary/90 shadow-primary/30 hover:scale-[1.01] active:scale-[0.99]"
+          "bg-primary hover:bg-primary/90 shadow-primary/30 hover:scale-[1.01] active:scale-[0.99]"
         )}
       >
         {isLoading ? (
           <><Loader2 className="h-6 w-6 animate-spin" /> Transmitting to Neural Network...</>
-        ) : hasLimit ? (
-          <><AlertCircle className="h-6 w-6" /> Credits Depleted</>
         ) : (
           <><Sparkles className="h-6 w-6" /> Forge Master Prompt</>
         )}
