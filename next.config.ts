@@ -3,7 +3,7 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
-  trailingSlash: true,
+  // trailingSlash: true is removed to prevent conflicts with Netlify's automatic routing
   typescript: {
     ignoreBuildErrors: true,
   },
