@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Sparkles, Loader2, Image as ImageIcon, Video, Camera } from 'lucide-react';
+import { Sparkles, Loader2, Image as ImageIcon, Video, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,6 +37,10 @@ const CAMERA_ANGLES = [
   "Eye Level", "Drone Shot", "Dutch Angle", "Macro", "Over the Shoulder"
 ];
 
+const MODELS = [
+  "Muse Fast", "Muse Ultra", "Muse Pro", "Muse Preview"
+];
+
 interface PromptFormProps {
   onGenerated: (entry: PromptEntry) => void;
 }
@@ -49,6 +53,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
     style: 'Photorealistic',
     mood: 'Epic',
     medium: 'image' as 'image' | 'video',
+    model: 'Muse Pro',
     cameraAngle: 'Cinematic Close-up',
     aspectRatio: '16:9',
     references: '',
@@ -65,6 +70,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
         style: formData.style,
         mood: formData.mood,
         medium: formData.medium,
+        model: formData.model,
         cameraAngle: formData.cameraAngle,
         aspectRatio: formData.aspectRatio,
         artisticReferences: formData.references ? formData.references.split(',').map(s => s.trim()) : undefined,
@@ -80,6 +86,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
           style: formData.style,
           mood: formData.mood,
           medium: formData.medium,
+          model: formData.model,
           cameraAngle: formData.cameraAngle,
           aspectRatio: formData.aspectRatio,
           artisticReferences: formData.references ? formData.references.split(',').map(s => s.trim()) : [],
@@ -91,12 +98,12 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
       
       toast({
         title: "Synthesis Complete",
-        description: "The Muse has delivered your prompt.",
+        description: `The ${formData.model} has delivered your prompt.`,
       });
     } catch (error: any) {
       toast({
         title: "Model Congestion",
-        description: "The AI service is experiencing high load. Retrying...",
+        description: "The AI service is experiencing high load. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -107,8 +114,8 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-12">
       {/* Target Toggle */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="flex flex-col gap-6 w-full max-w-md">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
+        <div className="flex flex-col gap-6 w-full max-w-sm">
           <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Target Medium</Label>
           <Tabs 
             value={formData.medium} 
@@ -123,6 +130,26 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
               </TabsTrigger>
             </TabsList>
           </Tabs>
+        </div>
+
+        <div className="flex flex-col gap-6 w-full max-w-sm">
+          <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Neural Model</Label>
+          <Select
+            value={formData.model}
+            onValueChange={(val) => setFormData(prev => ({ ...prev, model: val }))}
+          >
+            <SelectTrigger className="h-14 bg-white/5 border-white/5 rounded-2xl px-6 font-bold">
+              <div className="flex items-center gap-3">
+                <Cpu className="h-4 w-4 text-primary" />
+                <SelectValue placeholder="Select Model" />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="bg-background border-white/10 rounded-2xl">
+              {MODELS.map(m => (
+                <SelectItem key={m} value={m} className="rounded-xl focus:bg-primary">{m}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -228,7 +255,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
         )}
       >
         {isLoading ? (
-          <><Loader2 className="h-6 w-6 animate-spin" /> Transmitting to Neural Network...</>
+          <><Loader2 className="h-6 w-6 animate-spin" /> Synthesizing with {formData.model}...</>
         ) : (
           <><Sparkles className="h-6 w-6" /> Forge Master Prompt</>
         )}

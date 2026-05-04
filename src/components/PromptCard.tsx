@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Copy, Heart, Trash2, Edit3, Check, X, Maximize, Image as ImageIcon, Video, Camera } from 'lucide-react';
+import { Copy, Heart, Trash2, Edit3, Check, X, Maximize, Image as ImageIcon, Video, Camera, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -61,6 +61,9 @@ export function PromptCard({ prompt, onUpdate, onToggleFavorite, onDelete }: Pro
             )}>
               {prompt.parameters.medium === 'video' ? <Video className="h-3 w-3" /> : <ImageIcon className="h-3 w-3" />}
               {prompt.parameters.medium}
+            </span>
+            <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 flex items-center gap-1.5">
+              <Cpu className="h-3 w-3" /> {prompt.parameters.model}
             </span>
             <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/5 text-white/70 border border-white/10">
               {prompt.parameters.style}

@@ -23,6 +23,9 @@ const GenerateCreativePromptInputSchema = z.object({
   medium: z
     .enum(['image', 'video'])
     .describe('The target medium: either a static image or a moving video.'),
+  model: z
+    .string()
+    .describe('The specific AI model selected for synthesis (e.g., "Muse Pro", "Muse Fast").'),
   cameraAngle: z
     .string()
     .optional()
@@ -54,10 +57,11 @@ const promptTemplate = ai.definePrompt({
   input: {schema: GenerateCreativePromptInputSchema},
   output: {schema: GenerateCreativePromptOutputSchema},
   prompt: `You are an expert creative prompt generator for AI models like Midjourney, DALL-E 3, Runway, and Luma. 
-Your task is to expand high-level inputs into a detailed, unique, and inspiring prompt tailored for the specified medium.
+Your task is to expand high-level inputs into a detailed, unique, and inspiring prompt tailored for the specified medium and targeted model.
 
 Specifications:
 Medium: {{{medium}}}
+Target Model: {{{model}}}
 Subject: {{{subject}}}
 Style: {{{style}}}
 Mood: {{{mood}}}
@@ -73,6 +77,7 @@ Artistic References: {{#each artisticReferences}} - {{{this}}}
 {{/if}}
 
 Instructions:
+- Tailor the prompt complexity to the "Target Model". "Muse Ultra" and "Muse Pro" should result in highly detailed, intricate prompts. "Muse Fast" should be concise but effective. "Muse Preview" should focus on experimental and cutting-edge visual concepts.
 - If Medium is "video", focus on dynamic motion, camera pans, frame rates, and temporal transitions. Describe how the scene evolves over time, specifically utilizing the requested camera angle.
 - If Medium is "image", focus on composition, lighting, texture, and intricate details that work in a single frame, emphasizing the chosen camera angle.
 - Be descriptive and imaginative.

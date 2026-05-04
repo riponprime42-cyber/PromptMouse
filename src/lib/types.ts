@@ -11,5 +11,6 @@ export interface PromptEntry {
     cameraAngle?: string;
     aspectRatio?: string;
     artisticReferences?: string[];
+    model: string;
   };
 }
