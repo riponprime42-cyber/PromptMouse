@@ -1,4 +1,3 @@
-
 export interface PromptEntry {
   id: string;
   text: string;
@@ -9,6 +8,7 @@ export interface PromptEntry {
     style: string;
     mood: string;
     medium: 'image' | 'video';
+    cameraAngle?: string;
     aspectRatio?: string;
     artisticReferences?: string[];
   };

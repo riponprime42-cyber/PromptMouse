@@ -1,8 +1,7 @@
-
 "use client";
 
 import React, { useState } from 'react';
-import { Sparkles, Loader2, Image as ImageIcon, Video } from 'lucide-react';
+import { Sparkles, Loader2, Image as ImageIcon, Video, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,6 +32,11 @@ const ASPECT_RATIOS = [
   "1:1", "16:9", "9:16", "4:3", "3:2", "21:9"
 ];
 
+const CAMERA_ANGLES = [
+  "Cinematic Close-up", "Wide Shot", "Bird's Eye View", "Low Angle", 
+  "Eye Level", "Drone Shot", "Dutch Angle", "Macro", "Over the Shoulder"
+];
+
 interface PromptFormProps {
   onGenerated: (entry: PromptEntry) => void;
 }
@@ -45,6 +49,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
     style: 'Photorealistic',
     mood: 'Epic',
     medium: 'image' as 'image' | 'video',
+    cameraAngle: 'Cinematic Close-up',
     aspectRatio: '16:9',
     references: '',
   });
@@ -60,6 +65,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
         style: formData.style,
         mood: formData.mood,
         medium: formData.medium,
+        cameraAngle: formData.cameraAngle,
         aspectRatio: formData.aspectRatio,
         artisticReferences: formData.references ? formData.references.split(',').map(s => s.trim()) : undefined,
       });
@@ -74,6 +80,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
           style: formData.style,
           mood: formData.mood,
           medium: formData.medium,
+          cameraAngle: formData.cameraAngle,
           aspectRatio: formData.aspectRatio,
           artisticReferences: formData.references ? formData.references.split(',').map(s => s.trim()) : [],
         }
@@ -131,7 +138,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
         <div className="space-y-4">
           <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Art Style</Label>
           <Select
@@ -161,6 +168,23 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
             <SelectContent className="bg-background border-white/10 rounded-2xl">
               {MOODS.map(m => (
                 <SelectItem key={m} value={m} className="rounded-xl focus:bg-primary">{m}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-4">
+          <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Camera Angle</Label>
+          <Select
+            value={formData.cameraAngle}
+            onValueChange={(val) => setFormData(prev => ({ ...prev, cameraAngle: val }))}
+          >
+            <SelectTrigger className="h-16 bg-white/[0.03] border-white/5 rounded-2xl px-6 font-bold">
+              <SelectValue placeholder="Select Angle" />
+            </SelectTrigger>
+            <SelectContent className="bg-background border-white/10 rounded-2xl">
+              {CAMERA_ANGLES.map(a => (
+                <SelectItem key={a} value={a} className="rounded-xl focus:bg-primary">{a}</SelectItem>
               ))}
             </SelectContent>
           </Select>

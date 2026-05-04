@@ -1,4 +1,3 @@
-
 'use server';
 /**
  * @fileOverview A creative prompt generation AI agent.
@@ -24,6 +23,10 @@ const GenerateCreativePromptInputSchema = z.object({
   medium: z
     .enum(['image', 'video'])
     .describe('The target medium: either a static image or a moving video.'),
+  cameraAngle: z
+    .string()
+    .optional()
+    .describe('The preferred camera angle or perspective (e.g., "low angle", "bird\'s eye view").'),
   aspectRatio: z
     .string()
     .optional()
@@ -58,6 +61,9 @@ Medium: {{{medium}}}
 Subject: {{{subject}}}
 Style: {{{style}}}
 Mood: {{{mood}}}
+{{#if cameraAngle}}
+Camera Angle: {{{cameraAngle}}}
+{{/if}}
 {{#if aspectRatio}}
 Aspect Ratio: {{{aspectRatio}}}
 {{/if}}
@@ -67,8 +73,8 @@ Artistic References: {{#each artisticReferences}} - {{{this}}}
 {{/if}}
 
 Instructions:
-- If Medium is "video", focus on dynamic motion, camera pans, frame rates, and temporal transitions. Describe how the scene evolves over time.
-- If Medium is "image", focus on composition, lighting, texture, and intricate details that work in a single frame.
+- If Medium is "video", focus on dynamic motion, camera pans, frame rates, and temporal transitions. Describe how the scene evolves over time, specifically utilizing the requested camera angle.
+- If Medium is "image", focus on composition, lighting, texture, and intricate details that work in a single frame, emphasizing the chosen camera angle.
 - Be descriptive and imaginative.
 - The output must be a single cohesive paragraph ready for use in a generative model.
 - Do not include meta-commentary, just the prompt.`,
