@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { ArrowLeft, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, ShieldCheck, AlertCircle, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,7 +11,7 @@ import { BrandLogo } from './BrandLogo';
 
 interface InviteViewProps {
   onBack: () => void;
-  onSuccess: (code: string) => void;
+  onSuccess: (code: string) => boolean;
 }
 
 export function InviteView({ onBack, onSuccess }: InviteViewProps) {
@@ -83,17 +83,28 @@ export function InviteView({ onBack, onSuccess }: InviteViewProps) {
                 )}
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full h-16 rounded-2xl bg-primary hover:bg-primary/90 font-black text-lg shadow-2xl shadow-primary/20 transition-all active:scale-95"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : (
-                  <span className="flex items-center gap-3">Verify Protocol <ShieldCheck className="h-5 w-5" /></span>
-                )}
-              </Button>
+              <div className="flex flex-col gap-4">
+                <Button 
+                  type="submit" 
+                  className="w-full h-16 rounded-2xl bg-primary hover:bg-primary/90 font-black text-lg shadow-2xl shadow-primary/20 transition-all active:scale-95"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    <span className="flex items-center gap-3">Verify Protocol <ShieldCheck className="h-5 w-5" /></span>
+                  )}
+                </Button>
+
+                <a 
+                  href="https://t.me/ALVITEACH" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-full h-14 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest text-white/60 transition-all"
+                >
+                  <Send className="h-4 w-4 text-accent" /> I don't have an invite code
+                </a>
+              </div>
             </div>
           </form>
 
