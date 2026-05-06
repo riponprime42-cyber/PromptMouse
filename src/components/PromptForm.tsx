@@ -102,8 +102,8 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
       });
     } catch (error: any) {
       toast({
-        title: "Model Congestion",
-        description: "The AI service is experiencing high load. Please try again.",
+        title: "Model Error",
+        description: error.message || "The AI service is experiencing high load. Please try again.",
         variant: "destructive",
       });
     } finally {
