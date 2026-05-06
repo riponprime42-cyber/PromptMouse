@@ -29,12 +29,19 @@ const MOODS = [
 ];
 
 const ASPECT_RATIOS = [
-  { label: "1:1", icon: <Square className="h-4 w-4" /> },
-  { label: "16:9", icon: <RectangleHorizontal className="h-4 w-4" /> },
-  { label: "9:16", icon: <RectangleVertical className="h-4 w-4" /> },
-  { label: "4:3", icon: <RectangleHorizontal className="h-4 w-4 opacity-80" /> },
-  { label: "3:2", icon: <RectangleHorizontal className="h-4 w-4 opacity-90" /> },
-  { label: "21:9", icon: <RectangleHorizontal className="h-4 w-4 scale-x-125" /> }
+  { label: "1:1", icon: <Square className="h-4 w-4" />, desc: "Square (Instagram/Profile)" },
+  { label: "16:9", icon: <RectangleHorizontal className="h-4 w-4" />, desc: "Widescreen (YouTube/TV)" },
+  { label: "9:16", icon: <RectangleVertical className="h-4 w-4" />, desc: "Stories (TikTok/Reels)" },
+  { label: "4:3", icon: <RectangleHorizontal className="h-4 w-4 opacity-80" />, desc: "Classic (Photography/TV)" },
+  { label: "3:4", icon: <RectangleVertical className="h-4 w-4 opacity-80" />, desc: "Portrait (Standard Tablet)" },
+  { label: "3:2", icon: <RectangleHorizontal className="h-4 w-4 opacity-90" />, desc: "Photo (Standard DSLR)" },
+  { label: "2:3", icon: <RectangleVertical className="h-4 w-4 opacity-90" />, desc: "Vertical Photo (Postcard)" },
+  { label: "4:5", icon: <RectangleVertical className="h-4 w-4 scale-y-110" />, desc: "IG Portrait (Optimized)" },
+  { label: "5:4", icon: <RectangleHorizontal className="h-4 w-4 scale-x-110" />, desc: "Art Print (Standard)" },
+  { label: "21:9", icon: <RectangleHorizontal className="h-4 w-4 scale-x-125" />, desc: "Ultrawide (Gaming/Cinema)" },
+  { label: "2.39:1", icon: <RectangleHorizontal className="h-4 w-4 scale-x-150 opacity-70" />, desc: "Anamorphic (Cinemascope)" },
+  { label: "1.85:1", icon: <RectangleHorizontal className="h-4 w-4 scale-x-110 opacity-70" />, desc: "Theatrical (Widescreen Cinema)" },
+  { label: "9:19.5", icon: <RectangleVertical className="h-4 w-4 scale-y-125 opacity-70" />, desc: "Mobile (Modern iPhone/Android)" }
 ];
 
 const CAMERA_ANGLES = [
@@ -231,12 +238,15 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
             <SelectTrigger className="h-16 bg-white/[0.03] border-white/5 rounded-2xl px-6 font-bold">
               <SelectValue placeholder="Select Ratio" />
             </SelectTrigger>
-            <SelectContent className="bg-background border-white/10 rounded-2xl">
+            <SelectContent className="bg-background border-white/10 rounded-2xl max-h-[400px]">
               {ASPECT_RATIOS.map(r => (
                 <SelectItem key={r.label} value={r.label} className="rounded-xl focus:bg-primary">
                   <div className="flex items-center gap-3">
-                    {r.icon}
-                    <span>{r.label}</span>
+                    <div className="w-6 flex justify-center">{r.icon}</div>
+                    <div className="flex flex-col">
+                      <span className="font-bold">{r.label}</span>
+                      <span className="text-[8px] opacity-40 uppercase tracking-tighter leading-none">{r.desc}</span>
+                    </div>
                   </div>
                 </SelectItem>
               ))}
