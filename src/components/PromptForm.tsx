@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Sparkles, Loader2, Image as ImageIcon, Video, Cpu } from 'lucide-react';
+import { Sparkles, Loader2, Image as ImageIcon, Video, Cpu, Square, RectangleHorizontal, RectangleVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,7 +29,12 @@ const MOODS = [
 ];
 
 const ASPECT_RATIOS = [
-  "1:1", "16:9", "9:16", "4:3", "3:2", "21:9"
+  { label: "1:1", icon: <Square className="h-4 w-4" /> },
+  { label: "16:9", icon: <RectangleHorizontal className="h-4 w-4" /> },
+  { label: "9:16", icon: <RectangleVertical className="h-4 w-4" /> },
+  { label: "4:3", icon: <RectangleHorizontal className="h-4 w-4 opacity-80" /> },
+  { label: "3:2", icon: <RectangleHorizontal className="h-4 w-4 opacity-90" /> },
+  { label: "21:9", icon: <RectangleHorizontal className="h-4 w-4 scale-x-125" /> }
 ];
 
 const CAMERA_ANGLES = [
@@ -228,7 +233,12 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
             </SelectTrigger>
             <SelectContent className="bg-background border-white/10 rounded-2xl">
               {ASPECT_RATIOS.map(r => (
-                <SelectItem key={r} value={r} className="rounded-xl focus:bg-primary">{r}</SelectItem>
+                <SelectItem key={r.label} value={r.label} className="rounded-xl focus:bg-primary">
+                  <div className="flex items-center gap-3">
+                    {r.icon}
+                    <span>{r.label}</span>
+                  </div>
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
