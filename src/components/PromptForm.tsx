@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Sparkles, Loader2, Image as ImageIcon, Video, Cpu, Square, RectangleHorizontal, RectangleVertical } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Sparkles, Loader2, Image as ImageIcon, Video, Cpu, Square, RectangleHorizontal, RectangleVertical, Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -59,7 +59,10 @@ interface PromptFormProps {
 
 export function PromptForm({ onGenerated }: PromptFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  
   const [formData, setFormData] = useState({
     subject: '',
     style: 'Photorealistic',
@@ -69,16 +72,52 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
     cameraAngle: 'Cinematic Close-up',
     aspectRatio: '16:9',
     references: '',
+    imageDataUri: '',
   });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File Too Large",
+          description: "Please upload an image smaller than 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setImagePreview(base64);
+        setFormData(prev => ({ ...prev, imageDataUri: base64 }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    setFormData(prev => ({ ...prev, imageDataUri: '' }));
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.subject) return;
+    if (!formData.subject && !formData.imageDataUri) {
+      toast({
+        title: "Missing Content",
+        description: "Please provide a subject description or upload a reference image.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setIsLoading(true);
     try {
       const result = await generateCreativePrompt({
-        subject: formData.subject,
+        subject: formData.subject || "Based on reference image",
         style: formData.style,
         mood: formData.mood,
         medium: formData.medium,
@@ -86,6 +125,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
         cameraAngle: formData.cameraAngle,
         aspectRatio: formData.aspectRatio,
         artisticReferences: formData.references ? formData.references.split(',').map(s => s.trim()) : undefined,
+        imageDataUri: formData.imageDataUri || undefined,
       });
 
       const newEntry: PromptEntry = {
@@ -102,11 +142,14 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
           cameraAngle: formData.cameraAngle,
           aspectRatio: formData.aspectRatio,
           artisticReferences: formData.references ? formData.references.split(',').map(s => s.trim()) : [],
+          imageDataUri: formData.imageDataUri || undefined,
         }
       };
 
       onGenerated(newEntry);
-      setFormData(prev => ({ ...prev, subject: '' }));
+      setFormData(prev => ({ ...prev, subject: '', imageDataUri: '' }));
+      setImagePreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
       
       toast({
         title: "Synthesis Complete",
@@ -125,7 +168,6 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-12">
-      {/* Target Toggle */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
         <div className="flex flex-col gap-6 w-full max-w-sm">
           <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Target Medium</Label>
@@ -165,16 +207,56 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
         </div>
       </div>
 
-      <div className="space-y-4">
-        <Label htmlFor="subject" className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Core Vision</Label>
-        <Input
-          id="subject"
-          placeholder="Describe your masterpiece..."
-          value={formData.subject}
-          onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
-          className="h-20 bg-white/[0.03] border-white/5 focus:border-primary/50 transition-all text-2xl font-light rounded-3xl px-8 placeholder:text-white/10"
-          required
-        />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="lg:col-span-2 space-y-4">
+          <Label htmlFor="subject" className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Core Vision</Label>
+          <Input
+            id="subject"
+            placeholder="Describe your masterpiece or leave blank to use image only..."
+            value={formData.subject}
+            onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+            className="h-20 bg-white/[0.03] border-white/5 focus:border-primary/50 transition-all text-2xl font-light rounded-3xl px-8 placeholder:text-white/10"
+          />
+        </div>
+
+        <div className="space-y-4">
+          <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-accent">Reference Image</Label>
+          <div className="relative h-20 group">
+            <input 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              ref={fileInputRef} 
+              onChange={handleFileChange}
+            />
+            {!imagePreview ? (
+              <Button 
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full h-full rounded-3xl border-dashed border-white/10 bg-white/[0.02] hover:bg-white/5 hover:border-accent/40 flex flex-col items-center justify-center gap-1 group transition-all"
+              >
+                <Upload className="h-5 w-5 text-accent group-hover:scale-110 transition-transform" />
+                <span className="text-[9px] font-bold uppercase tracking-widest text-white/30">Upload Reference</span>
+              </Button>
+            ) : (
+              <div className="w-full h-full relative rounded-3xl overflow-hidden border border-accent/30 group">
+                <img src={imagePreview} alt="Reference" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={removeImage}
+                    className="h-10 w-10 rounded-full bg-destructive/20 text-destructive hover:bg-destructive hover:text-white"
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
@@ -268,7 +350,7 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
 
       <Button
         type="submit"
-        disabled={isLoading || !formData.subject}
+        disabled={isLoading || (!formData.subject && !formData.imageDataUri)}
         className={cn(
           "w-full h-20 text-xl font-black gap-4 shadow-2xl transition-all rounded-3xl",
           "bg-primary hover:bg-primary/90 shadow-primary/30 hover:scale-[1.01] active:scale-[0.99]"

@@ -12,5 +12,6 @@ export interface PromptEntry {
     aspectRatio?: string;
     artisticReferences?: string[];
     model: string;
+    imageDataUri?: string;
   };
 }

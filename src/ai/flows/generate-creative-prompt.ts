@@ -38,6 +38,12 @@ const GenerateCreativePromptInputSchema = z.object({
     .array(z.string())
     .optional()
     .describe('Optional list of artistic references or artists to draw inspiration from.'),
+  imageDataUri: z
+    .string()
+    .optional()
+    .describe(
+      "An optional reference image as a data URI. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+    ),
 });
 export type GenerateCreativePromptInput = z.infer<typeof GenerateCreativePromptInputSchema>;
 
@@ -96,6 +102,14 @@ Artistic References: {{#each artisticReferences}} - {{{this}}}
 {{/each}}
 {{/if}}
 
+{{#if imageDataUri}}
+Reference Image: {{media url=imageDataUri}}
+Instructions for Reference Image:
+- Analyze the provided reference image carefully. 
+- Incorporate visual elements, colors, textures, and composition from the image into the generated prompt.
+- If the user provided a "Subject", blend it creatively with what you see in the image.
+{{/if}}
+
 Instructions:
 - Tailor the prompt complexity to the "Target Model". "Muse Ultra" and "Muse Pro" should result in highly detailed, intricate prompts. "Muse Fast" should be concise but effective. "Muse Preview" should focus on experimental and cutting-edge visual concepts.
 - If Medium is "video", focus on dynamic motion, camera pans, frame rates, and temporal transitions. Describe how the scene evolves over time, specifically utilizing the requested camera angle.
@@ -125,7 +139,6 @@ const generateCreativePromptFlow = ai.defineFlow(
         if (attempts >= maxAttempts) {
           throw error;
         }
-        // Wait before retrying (exponential backoff: 1s, 2s)
         await new Promise((resolve) => setTimeout(resolve, attempts * 1000));
       }
     }
