@@ -20,7 +20,8 @@ import { cn } from '@/lib/utils';
 
 const STYLES = [
   "Photorealistic", "Digital Art", "Cyberpunk", "Fantasy Art", "Impressionistic", 
-  "Anime / Manga", "Minimalist", "Surrealism", "Pop Art", "Concept Art", "Cinematic"
+  "Anime / Manga", "Minimalist", "Surrealism", "Pop Art", "Concept Art", "Cinematic",
+  "Cartoon", "Drawing Style"
 ];
 
 const MOODS = [
@@ -169,24 +170,24 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-12">
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
-        <div className="flex flex-col gap-6 w-full max-w-sm">
+        <div className="flex flex-col gap-6 w-full max-sm:max-w-full lg:max-w-sm">
           <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Target Medium</Label>
           <Tabs 
             value={formData.medium} 
             onValueChange={(val) => setFormData(prev => ({ ...prev, medium: val as 'image' | 'video' }))}
           >
             <TabsList className="grid w-full grid-cols-2 bg-white/5 border border-white/5 h-14 rounded-2xl p-1.5">
-              <TabsTrigger value="image" className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white flex items-center gap-3 font-bold">
+              <TabsTrigger value="image" className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white flex items-center justify-center gap-3 font-bold">
                 <ImageIcon className="h-4 w-4" /> Image
               </TabsTrigger>
-              <TabsTrigger value="video" className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white flex items-center gap-3 font-bold">
+              <TabsTrigger value="video" className="rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white flex items-center justify-center gap-3 font-bold">
                 <Video className="h-4 w-4" /> Video
               </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
 
-        <div className="flex flex-col gap-6 w-full max-w-sm">
+        <div className="flex flex-col gap-6 w-full max-sm:max-w-full lg:max-w-sm">
           <Label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Neural Model</Label>
           <Select
             value={formData.model}
