@@ -20,22 +20,28 @@ import {
   MousePointer2,
   ShieldCheck,
   ChevronDown,
-  Send
+  Send,
+  User as UserIcon
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { PromptForm } from './PromptForm';
 import { PromptCard } from './PromptCard';
 import { InviteView } from './InviteView';
+import { AuthView } from './AuthView';
 import { KeyGeneratorView } from './KeyGeneratorView';
 import { LoadingView } from './LoadingView';
 import { BrandLogo } from './BrandLogo';
 import { usePromptsStore } from '@/hooks/use-prompts-store';
 import { useInvite } from '@/hooks/use-invite-store';
 import { useToast } from '@/hooks/use-toast';
+import { useUser, useAuth } from '@/firebase';
+import { signOut } from 'firebase/auth';
 import { cn } from '@/lib/utils';
 
 export function PromptMuseApp() {
+  const { user, loading: userLoading } = useUser();
+  const auth = useAuth();
   const { 
     prompts, 
     addPrompt, 
@@ -48,11 +54,11 @@ export function PromptMuseApp() {
   const {
     isAuthorized,
     validateCode,
-    logout
+    logout: logoutInvite
   } = useInvite();
 
   const [scrolled, setScrolled] = useState(false);
-  const [view, setView] = useState<'landing' | 'invite' | 'studio' | 'generator' | 'loading'>('landing');
+  const [view, setView] = useState<'landing' | 'auth' | 'invite' | 'studio' | 'generator' | 'loading'>('landing');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -63,26 +69,32 @@ export function PromptMuseApp() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Handle protected view transitions
   useEffect(() => {
-    if ((view === 'studio' || view === 'generator' || view === 'loading') && !isAuthorized) {
-      setView('landing');
+    if (view === 'studio' || view === 'generator' || view === 'invite') {
+      if (!user) {
+        setView('auth');
+      } else if (!isAuthorized && view !== 'invite') {
+        setView('invite');
+      }
     }
-  }, [isAuthorized, view]);
+  }, [user, isAuthorized, view]);
 
-  const startLoading = (targetView: 'studio' | 'generator') => {
+  const startLoading = (targetView: 'studio' | 'generator' | 'invite') => {
     setView('loading');
-    // Artificial delay for premium neural feel
     setTimeout(() => {
       setView(targetView);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 2000);
+    }, 1500);
   };
 
   const openStudioTrigger = () => {
-    if (isAuthorized) {
-      startLoading('studio');
-    } else {
+    if (!user) {
+      setView('auth');
+    } else if (!isAuthorized) {
       setView('invite');
+    } else {
+      startLoading('studio');
     }
   };
 
@@ -91,10 +103,21 @@ export function PromptMuseApp() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleLogout = () => {
-    logout();
-    setView('landing');
-    toast({ title: "Logged Out", description: "Your neural session has ended." });
+  const handleLogout = async () => {
+    if (auth) {
+      await signOut(auth);
+      logoutInvite();
+      setView('landing');
+      toast({ title: "Session Ended", description: "You have been securely logged out." });
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    if (isAuthorized) {
+      startLoading('studio');
+    } else {
+      setView('invite');
+    }
   };
 
   const handleInviteSuccess = (code: string) => {
@@ -106,10 +129,12 @@ export function PromptMuseApp() {
     return false;
   };
 
-  const favorites = prompts.filter(p => p.isFavorite);
-
-  if (view === 'loading') {
+  if (view === 'loading' || userLoading) {
     return <LoadingView />;
+  }
+
+  if (view === 'auth') {
+    return <AuthView onBack={() => setView('landing')} onSuccess={handleAuthSuccess} />;
   }
 
   if (view === 'invite') {
@@ -146,9 +171,15 @@ export function PromptMuseApp() {
 
                 <div className="w-[1px] h-6 bg-white/10 mx-2" />
 
-                <Button variant="ghost" size="sm" onClick={handleLogout} className="rounded-full gap-2 text-white/40 hover:text-destructive hover:bg-destructive/10">
-                  <LogOut className="h-4 w-4" /> Sign Out
-                </Button>
+                <div className="flex items-center gap-3 mr-2">
+                  <div className="flex flex-col items-end hidden sm:flex">
+                    <span className="text-[10px] font-black uppercase text-white/80">{user?.displayName || 'Creator'}</span>
+                    <span className="text-[8px] font-medium text-white/40">{user?.email}</span>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={handleLogout} className="rounded-full gap-2 text-white/40 hover:text-destructive hover:bg-destructive/10">
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -235,7 +266,7 @@ export function PromptMuseApp() {
         scrolled ? "bg-background/80 backdrop-blur-2xl py-4 border-b border-white/5" : "bg-transparent py-8"
       )}>
         <div className="max-w-7xl mx-auto px-8 flex items-center justify-between">
-          <div className="flex items-center gap-4 cursor-pointer group">
+          <div className="flex items-center gap-4 cursor-pointer group" onClick={closeStudio}>
             <BrandLogo className="w-10 h-10 group-hover:rotate-12 transition-transform duration-500" />
             <span className="text-xl font-black tracking-tighter">PROMPTMUSE</span>
           </div>
@@ -256,9 +287,20 @@ export function PromptMuseApp() {
               <Send className="h-3.5 w-3.5" /> Invite Code
             </a>
 
-            <Button onClick={openStudioTrigger} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-11 text-xs shadow-2xl transition-all active:scale-95">
-              Launch Studio
-            </Button>
+            {user ? (
+              <div className="flex items-center gap-4">
+                <Button onClick={openStudioTrigger} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-11 text-xs shadow-2xl transition-all">
+                  Studio
+                </Button>
+                <Button variant="ghost" onClick={handleLogout} className="rounded-full h-11 w-11 p-0 text-white/40 hover:text-destructive">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button onClick={() => setView('auth')} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-11 text-xs shadow-2xl transition-all active:scale-95">
+                Sign In
+              </Button>
+            )}
           </div>
         </div>
       </nav>
@@ -295,10 +337,10 @@ export function PromptMuseApp() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <Button size="lg" onClick={openStudioTrigger} className="h-16 px-12 text-lg font-black rounded-2xl gap-3 bg-primary text-white hover:bg-primary/90 shadow-[0_0_50px_rgba(59,130,246,0.3)] transition-all hover:scale-105 active:scale-95">
-              Access Studio <ArrowRight className="h-5 w-5" />
+              Launch Studio <ArrowRight className="h-5 w-5" />
             </Button>
-            <Button size="lg" variant="ghost" className="h-16 px-10 text-lg font-black rounded-2xl border border-white/10 text-white/60 hover:text-white hover:bg-white/5 transition-all">
-              Watch Demo
+            <Button size="lg" variant="ghost" onClick={() => setView('auth')} className="h-16 px-10 text-lg font-black rounded-2xl border border-white/10 text-white/60 hover:text-white hover:bg-white/5 transition-all">
+              {user ? 'My Profile' : 'Get Started'}
             </Button>
           </div>
           
