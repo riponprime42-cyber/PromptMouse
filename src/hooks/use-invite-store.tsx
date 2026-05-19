@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const CODES_STORAGE_KEY = 'promptmuse_valid_codes';
-const SESSION_STORAGE_KEY = 'promptmuse_is_authorized';
+const AUTH_STORAGE_KEY = 'promptmuse_is_authorized_v2'; // Changed key to differentiate from session
 
 interface InviteContextType {
   isAuthorized: boolean;
@@ -24,7 +24,7 @@ export function InviteProvider({ children }: { children: React.ReactNode }) {
   // Initial load
   useEffect(() => {
     const savedCodes = localStorage.getItem(CODES_STORAGE_KEY);
-    const sessionAuth = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    const persistentAuth = localStorage.getItem(AUTH_STORAGE_KEY);
 
     if (savedCodes) {
       try {
@@ -39,7 +39,7 @@ export function InviteProvider({ children }: { children: React.ReactNode }) {
       }
     }
     
-    if (sessionAuth === 'true') {
+    if (persistentAuth === 'true') {
       setIsAuthorized(true);
     }
     setIsLoaded(true);
@@ -58,7 +58,7 @@ export function InviteProvider({ children }: { children: React.ReactNode }) {
       if (e.key === CODES_STORAGE_KEY && e.newValue) {
         setValidCodes(JSON.parse(e.newValue));
       }
-      if (e.key === SESSION_STORAGE_KEY) {
+      if (e.key === AUTH_STORAGE_KEY) {
         setIsAuthorized(e.newValue === 'true');
       }
     };
@@ -68,9 +68,10 @@ export function InviteProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const validateCode = (code: string) => {
-    if (code.toUpperCase() === 'MUSE-2026' || validCodes.includes(code.toUpperCase())) {
+    const upperCode = code.toUpperCase();
+    if (upperCode === 'MUSE-2026' || validCodes.includes(upperCode)) {
       setIsAuthorized(true);
-      sessionStorage.setItem(SESSION_STORAGE_KEY, 'true');
+      localStorage.setItem(AUTH_STORAGE_KEY, 'true');
       return true;
     }
     return false;
@@ -84,7 +85,7 @@ export function InviteProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setIsAuthorized(false);
-    sessionStorage.removeItem(SESSION_STORAGE_KEY);
+    localStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
   return (
