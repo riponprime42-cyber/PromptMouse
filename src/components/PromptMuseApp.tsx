@@ -61,6 +61,9 @@ export function PromptMuseApp() {
   const [view, setView] = useState<'landing' | 'auth' | 'invite' | 'studio' | 'generator' | 'loading'>('landing');
   const { toast } = useToast();
 
+  // Derived state for favorites
+  const favorites = prompts.filter(p => p.isFavorite);
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -72,13 +75,13 @@ export function PromptMuseApp() {
   // Handle protected view transitions
   useEffect(() => {
     if (view === 'studio' || view === 'generator' || view === 'invite') {
-      if (!user) {
+      if (!user && !userLoading) {
         setView('auth');
-      } else if (!isAuthorized && view !== 'invite') {
+      } else if (user && !isAuthorized && view !== 'invite') {
         setView('invite');
       }
     }
-  }, [user, isAuthorized, view]);
+  }, [user, userLoading, isAuthorized, view]);
 
   const startLoading = (targetView: 'studio' | 'generator' | 'invite') => {
     setView('loading');
