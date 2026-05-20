@@ -4,13 +4,12 @@
  * @fileOverview A creative prompt generation AI agent.
  *
  * - generateCreativePrompt - A function that handles the creative prompt generation process.
- * - GenerateCreativePromptInput - The input type for the generateCreativePrompt function.
- * - GenerateCreativePromptOutput - The return type for the generateCreativePrompt function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+// Input Schema - Not exported as const to follow 'use server' restrictions in NextJS 15
 const GenerateCreativePromptInputSchema = z.object({
   subject: z.string().describe('The main subject or theme for the image/video.'),
   style: z
@@ -47,29 +46,33 @@ const GenerateCreativePromptInputSchema = z.object({
     ),
 });
 
-export type GenerateCreativePromptInput = z.infer<typeof GenerateCreativePromptInputSchema>;
-
+// Output Schema
 const GenerateCreativePromptOutputSchema = z.object({
   prompt: z.string().describe('The generated detailed creative prompt for image or video creation.'),
 });
 
-export type GenerateCreativePromptOutput = z.infer<typeof GenerateCreativePromptOutputSchema>;
-
 /**
  * Server action to generate creative prompts.
- * Returns a result object to avoid throwing raw errors in production.
+ * Next.js 15: Only async functions should be exported from "use server" files.
  */
 export async function generateCreativePrompt(
-  input: GenerateCreativePromptInput
-): Promise<{ success: boolean; data?: GenerateCreativePromptOutput; error?: string }> {
+  input: any
+): Promise<{ success: boolean; data?: any; error?: string }> {
   try {
     const result = await generateCreativePromptFlow(input);
     return { success: true, data: result };
   } catch (error: any) {
     console.error('Generation Error:', error);
+    
+    // Provide a clearer error message for missing API keys on Vercel
+    let errorMessage = error.message || 'The AI engine is currently busy.';
+    if (errorMessage.includes('API key') || errorMessage.includes('FAILED_PRECONDITION')) {
+      errorMessage = 'Neural Link Error: Please ensure your GEMINI_API_KEY is correctly set in Vercel Environment Variables.';
+    }
+    
     return { 
       success: false, 
-      error: error.message || 'The AI engine is currently busy or the API key is invalid.' 
+      error: errorMessage
     };
   }
 }
