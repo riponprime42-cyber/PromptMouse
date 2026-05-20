@@ -21,10 +21,21 @@ import {
   ShieldCheck,
   ChevronDown,
   Send,
-  User as UserIcon
+  User as UserIcon,
+  Settings,
+  LayoutDashboard
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PromptForm } from './PromptForm';
 import { PromptCard } from './PromptCard';
 import { InviteView } from './InviteView';
@@ -132,6 +143,49 @@ export function PromptMuseApp() {
     return false;
   };
 
+  const UserProfileMenu = () => {
+    if (!user) return null;
+
+    const initials = user.displayName 
+      ? user.displayName.split(' ').map(n => n[0]).join('').toUpperCase()
+      : user.email ? user.email[0].toUpperCase() : 'U';
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="relative h-10 w-10 rounded-full border border-white/10 p-0 overflow-hidden hover:scale-105 transition-all">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
+              <AvatarFallback className="bg-primary/20 text-primary font-bold">{initials}</AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56 bg-background/95 backdrop-blur-xl border-white/10 text-white rounded-2xl p-2" align="end" forceMount>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1 p-2">
+              <p className="text-sm font-black leading-none tracking-tight">{user.displayName || 'Neural Creator'}</p>
+              <p className="text-xs leading-none text-white/40 font-light truncate">{user.email}</p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator className="bg-white/5" />
+          <DropdownMenuItem className="rounded-xl focus:bg-primary/20 focus:text-primary gap-3 p-3 cursor-pointer" onClick={openStudioTrigger}>
+            <LayoutDashboard className="h-4 w-4" />
+            <span>Launch Studio</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="rounded-xl focus:bg-primary/20 focus:text-primary gap-3 p-3 cursor-pointer" onClick={() => setView('generator')}>
+            <Key className="h-4 w-4" />
+            <span>Key Vault</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator className="bg-white/5" />
+          <DropdownMenuItem className="rounded-xl focus:bg-destructive/20 focus:text-destructive gap-3 p-3 cursor-pointer" onClick={handleLogout}>
+            <LogOut className="h-4 w-4" />
+            <span>Terminate Session</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
   if (view === 'loading' || userLoading) {
     return <LoadingView />;
   }
@@ -161,29 +215,16 @@ export function PromptMuseApp() {
               </div>
             </div>
             
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setView('generator')}
-                  className="rounded-full gap-2 border-white/10 bg-white/5 hover:bg-white/10 font-bold"
-                  size="sm"
-                >
-                  <Key className="h-4 w-4 text-primary" /> Key Vault
-                </Button>
-
-                <div className="w-[1px] h-6 bg-white/10 mx-2" />
-
-                <div className="flex items-center gap-3 mr-2">
-                  <div className="flex flex-col items-end hidden sm:flex">
-                    <span className="text-[10px] font-black uppercase text-white/80">{user?.displayName || 'Creator'}</span>
-                    <span className="text-[8px] font-medium text-white/40">{user?.email}</span>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={handleLogout} className="rounded-full gap-2 text-white/40 hover:text-destructive hover:bg-destructive/10">
-                    <LogOut className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setView('generator')}
+                className="rounded-full gap-2 border-white/10 bg-white/5 hover:bg-white/10 font-bold hidden sm:flex"
+                size="sm"
+              >
+                <Key className="h-4 w-4 text-primary" /> Key Vault
+              </Button>
+              <UserProfileMenu />
             </div>
           </div>
         </nav>
@@ -291,13 +332,11 @@ export function PromptMuseApp() {
             </a>
 
             {user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-6">
                 <Button onClick={openStudioTrigger} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-11 text-xs shadow-2xl transition-all">
                   Studio
                 </Button>
-                <Button variant="ghost" onClick={handleLogout} className="rounded-full h-11 w-11 p-0 text-white/40 hover:text-destructive">
-                  <LogOut className="h-4 w-4" />
-                </Button>
+                <UserProfileMenu />
               </div>
             ) : (
               <Button onClick={() => setView('auth')} className="rounded-full px-8 bg-white text-black hover:bg-white/90 font-black h-11 text-xs shadow-2xl transition-all active:scale-95">
