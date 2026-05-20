@@ -9,7 +9,6 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-// Input Schema - Not exported as const to follow 'use server' restrictions in NextJS 15
 const GenerateCreativePromptInputSchema = z.object({
   subject: z.string().describe('The main subject or theme for the image/video.'),
   style: z
@@ -46,7 +45,6 @@ const GenerateCreativePromptInputSchema = z.object({
     ),
 });
 
-// Output Schema
 const GenerateCreativePromptOutputSchema = z.object({
   prompt: z.string().describe('The generated detailed creative prompt for image or video creation.'),
 });
@@ -58,16 +56,32 @@ const GenerateCreativePromptOutputSchema = z.object({
 export async function generateCreativePrompt(
   input: any
 ): Promise<{ success: boolean; data?: any; error?: string }> {
+  // Defensive check for API Key before calling the AI
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY || process.env.GOOGLE_API_KEY;
+  
+  if (!apiKey) {
+    return {
+      success: false,
+      error: 'Neural Link Error: GEMINI_API_KEY is missing from Vercel. Please go to Project Settings > Environment Variables and add GEMINI_API_KEY.'
+    };
+  }
+
   try {
     const result = await generateCreativePromptFlow(input);
     return { success: true, data: result };
   } catch (error: any) {
     console.error('Generation Error:', error);
     
-    // Provide a clearer error message for missing API keys on Vercel
     let errorMessage = error.message || 'The AI engine is currently busy.';
-    if (errorMessage.includes('API key') || errorMessage.includes('FAILED_PRECONDITION')) {
-      errorMessage = 'Neural Link Error: Please ensure your GEMINI_API_KEY is correctly set in Vercel Environment Variables.';
+    
+    // Catch common permission/key errors and provide helpful Vercel-specific guidance
+    if (
+      errorMessage.includes('API key') || 
+      errorMessage.includes('key not valid') || 
+      errorMessage.includes('FAILED_PRECONDITION') ||
+      errorMessage.includes('403')
+    ) {
+      errorMessage = 'Neural Link Error: The API key provided is invalid or not found. Please verify your GEMINI_API_KEY in Vercel settings.';
     }
     
     return { 
