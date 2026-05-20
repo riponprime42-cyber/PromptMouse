@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { 
   Sparkles, 
   History, 
@@ -555,11 +556,20 @@ function FooterCol({ title, items }: { title: string, items: string[] }) {
     <div className="flex flex-col gap-6">
       <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">{title}</h4>
       <div className="flex flex-col gap-3">
-        {items.map(item => (
-          <button key={item} className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 hover:text-primary transition-colors text-left">
-            {item}
-          </button>
-        ))}
+        {items.map(item => {
+          if (item === "Privacy") {
+            return (
+              <Link key={item} href="/privacy" className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 hover:text-primary transition-colors text-left">
+                {item}
+              </Link>
+            );
+          }
+          return (
+            <button key={item} className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 hover:text-primary transition-colors text-left">
+              {item}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
