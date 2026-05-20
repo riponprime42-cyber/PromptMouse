@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A creative prompt generation AI agent.
@@ -139,6 +140,7 @@ const generateCreativePromptFlow = ai.defineFlow(
         if (attempts >= maxAttempts) {
           throw error;
         }
+        // Wait before retrying (exponential backoff)
         await new Promise((resolve) => setTimeout(resolve, attempts * 1000));
       }
     }
