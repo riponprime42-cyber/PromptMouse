@@ -16,7 +16,7 @@ const GenerateCreativePromptInputSchema = z.object({
   style: z
     .string()
     .describe(
-      'The artistic style or genre (e.g., "fantasy art", "cyberpunk", "impressionistic").'
+      'The artistic style or genre (e.g., "fantasy art", "cyberpunk", "impressionistic", "cartoon", "drawing style").'
     ),
   mood: z
     .string()
@@ -46,17 +46,32 @@ const GenerateCreativePromptInputSchema = z.object({
       "An optional reference image as a data URI. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
 });
+
 export type GenerateCreativePromptInput = z.infer<typeof GenerateCreativePromptInputSchema>;
 
 const GenerateCreativePromptOutputSchema = z.object({
   prompt: z.string().describe('The generated detailed creative prompt for image or video creation.'),
 });
+
 export type GenerateCreativePromptOutput = z.infer<typeof GenerateCreativePromptOutputSchema>;
 
+/**
+ * Server action to generate creative prompts.
+ * Returns a result object to avoid throwing raw errors in production.
+ */
 export async function generateCreativePrompt(
   input: GenerateCreativePromptInput
-): Promise<GenerateCreativePromptOutput> {
-  return generateCreativePromptFlow(input);
+): Promise<{ success: boolean; data?: GenerateCreativePromptOutput; error?: string }> {
+  try {
+    const result = await generateCreativePromptFlow(input);
+    return { success: true, data: result };
+  } catch (error: any) {
+    console.error('Generation Error:', error);
+    return { 
+      success: false, 
+      error: error.message || 'The AI engine is currently busy or the API key is invalid.' 
+    };
+  }
 }
 
 const promptTemplate = ai.definePrompt({
@@ -65,22 +80,10 @@ const promptTemplate = ai.definePrompt({
   output: {schema: GenerateCreativePromptOutputSchema},
   config: {
     safetySettings: [
-      {
-        category: 'HARM_CATEGORY_HATE_SPEECH',
-        threshold: 'BLOCK_NONE',
-      },
-      {
-        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-        threshold: 'BLOCK_NONE',
-      },
-      {
-        category: 'HARM_CATEGORY_HARASSMENT',
-        threshold: 'BLOCK_NONE',
-      },
-      {
-        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-        threshold: 'BLOCK_NONE',
-      },
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
     ],
   },
   prompt: `You are an expert creative prompt generator for AI models like Midjourney, DALL-E 3, Runway, and Luma. 
@@ -108,13 +111,10 @@ Reference Image: {{media url=imageDataUri}}
 Instructions for Reference Image:
 - Analyze the provided reference image carefully. 
 - Incorporate visual elements, colors, textures, and composition from the image into the generated prompt.
-- If the user provided a "Subject", blend it creatively with what you see in the image.
 {{/if}}
 
 Instructions:
-- Tailor the prompt complexity to the "Target Model". "Muse Ultra" and "Muse Pro" should result in highly detailed, intricate prompts. "Muse Fast" should be concise but effective. "Muse Preview" should focus on experimental and cutting-edge visual concepts.
-- If Medium is "video", focus on dynamic motion, camera pans, frame rates, and temporal transitions. Describe how the scene evolves over time, specifically utilizing the requested camera angle.
-- If Medium is "image", focus on composition, lighting, texture, and intricate details that work in a single frame, emphasizing the chosen camera angle.
+- Tailor the prompt complexity to the "Target Model".
 - Be descriptive and imaginative.
 - The output must be a single cohesive paragraph ready for use in a generative model.
 - Do not include meta-commentary, just the prompt.`,
@@ -127,23 +127,8 @@ const generateCreativePromptFlow = ai.defineFlow(
     outputSchema: GenerateCreativePromptOutputSchema,
   },
   async (input) => {
-    let attempts = 0;
-    const maxAttempts = 3;
-
-    while (attempts < maxAttempts) {
-      try {
-        const {output} = await promptTemplate(input);
-        if (output) return output;
-        throw new Error('No output from prompt template');
-      } catch (error: any) {
-        attempts++;
-        if (attempts >= maxAttempts) {
-          throw error;
-        }
-        // Wait before retrying (exponential backoff)
-        await new Promise((resolve) => setTimeout(resolve, attempts * 1000));
-      }
-    }
-    throw new Error('Generation failed after multiple attempts');
+    const {output} = await promptTemplate(input);
+    if (!output) throw new Error('No output from prompt template');
+    return output;
   }
 );

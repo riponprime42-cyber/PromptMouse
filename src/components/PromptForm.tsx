@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useRef } from 'react';
@@ -129,9 +130,13 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
         imageDataUri: formData.imageDataUri || undefined,
       });
 
+      if (!result.success || !result.data) {
+        throw new Error(result.error || 'The neural engine failed to synthesize the prompt.');
+      }
+
       const newEntry: PromptEntry = {
         id: crypto.randomUUID(),
-        text: result.prompt,
+        text: result.data.prompt,
         timestamp: Date.now(),
         isFavorite: false,
         parameters: {
@@ -157,9 +162,10 @@ export function PromptForm({ onGenerated }: PromptFormProps) {
         description: `The ${formData.model} has delivered your prompt.`,
       });
     } catch (error: any) {
+      console.error('Client Generation Error:', error);
       toast({
         title: "Model Error",
-        description: error.message || "The AI service is experiencing high load. Please try again.",
+        description: error.message || "The AI service is experiencing high load or your API key is inactive.",
         variant: "destructive",
       });
     } finally {
